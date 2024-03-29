@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .input-form {
+      @apply py-2 pl-4 pr-10 w-full bg-slate focus:outline focus:outline-blue rounded-lg;
+    }
+
+} 
