@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 import InputField from "~/components/InputField";
 import { useNavigate } from "react-router-dom";
 
-import userApi from "~/api/userApi";
+import { signUp } from "~/api/userApi";
+import { notifySuccess, notifyError } from "~/utils/toastify";
 
 
 const schema = yup.object().shape({
@@ -31,20 +32,26 @@ const schema = yup.object().shape({
 
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    mode: "onBlur",
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = ({ email, username, password }) => {
+  const onSubmit = async ({ email, username, password }) => {
     const user = { email, username, password };
-    userApi.signUp(user).then(() => {
-      reset();
-      navigate("/");
-    });
+    try {
+      const response = await signUp(user);
+      if (response) {
+        setIsLoading(false);
+        reset();
+        notifySuccess(response.message);
+        navigate("/sign-in");
+      }
+    } catch (error) {
+      notifyError(error.message);
+    }
   };
-
-  const navigate = useNavigate();
-
 
   return (
     <div className="max-w-96 mx-auto my-20 shadow-form px-8 py-10 rounded-xl">
@@ -88,11 +95,14 @@ const SignUp = () => {
           placeholder={"Confirm your password"}
         />
 
-        <button type="submit" className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean">Sign up</button>
+        <button
+          type="submit"
+          className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
+        >Sign up</button>
       </form>
 
       <div className="flex justify-between mt-4">
-      <button>
+        <button>
           <Link to={"/forgot-password"} className="text-blue font-semibold hover:text-ocean">Forgot Password</Link>
         </button>
         <button>

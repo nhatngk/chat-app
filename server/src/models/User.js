@@ -57,7 +57,7 @@ userSchema.methods.hashPassword = async function () {
 
 userSchema.methods.comparePassword = async function (password) {
     try {
-        return bcrypt.compare(password, this.password);
+        return await bcrypt.compare(password, this.password);
     } catch (err) {
         throw createError(500, { message: err });
     }

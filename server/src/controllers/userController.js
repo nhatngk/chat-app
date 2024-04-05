@@ -118,16 +118,17 @@ const signIn = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
-
         const user = await Users.findOne({ email });
 
         if (!user) throw createError(400, "Email or password is incorrect");
 
-        const match = user.comparePassword(password);
+        const match = await user.comparePassword(password);
 
         if (!match) throw createError(400, "Email or password is incorrect");
 
-        const { password: pwd, ...userData } = user.toObject();
+        const { id, email: userEmail, username, avatar, verified } = user.toObject();
+
+        const userData = { id, email: userEmail, username, avatar, verified }
 
         const accessToken = jwt.generateAccessToken(user.id);
 
@@ -147,7 +148,8 @@ const signIn = async (req, res, next) => {
             refreshToken,
             {
                 httpOnly: true,
-                maxAge: secret.refresh_token_ttl * 1000
+                maxAge: secret.refresh_token_ttl * 1000,
+                path: "/api/user/refresh"
             }
         )
         return res.status(200).json({
@@ -196,7 +198,14 @@ const resetPassword = async (req, res) => {
 
 const getMe = async (req, res) => {
     try {
-        res.json("Get me successfully!");
+        const user = req.user;
+        const { id, email, username, avatar, verified } = user.toObject();
+
+        const userData = { id, email, username, avatar, verified };
+
+        return res.status(200).json({
+            user: userData
+        })
     } catch (error) {
     }
 }
@@ -223,7 +232,8 @@ const refreshToken = async (req, res) => {
             refreshToken,
             {
                 httpOnly: true,
-                expires: new Date(exp * 1000)
+                expires: new Date(exp * 1000),
+                path: "/api/user/refresh"
             }
         )
 

@@ -12,6 +12,7 @@ export default {
     },
     colors: {
       "white": "#fff",
+      'disable': '#6B7280',
       'blue': '#0075e9',
       'red': '#EB0014',
       'slate': '#F8FAFC',

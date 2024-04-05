@@ -15,12 +15,11 @@ const decode = (token, key) => {
 
 const verifyAccessToken = async (req, res, next) => {
     try {
-        const accessToken = req.cookies.accessToken;
+        const accessToken = req?.cookies?.accessToken;
 
         if (!accessToken) throw createError(401, "Unauthorized");
 
         const decodedToken = decode(accessToken, secret.access_key);
-
 
         const userId = decodedToken?.userId;
 
@@ -42,7 +41,7 @@ const verifyAccessToken = async (req, res, next) => {
 
 const verifyRefreshToken = async (req, res, next) => {
     try {
-        const refreshToken = req.cookies.refreshToken;
+        const refreshToken = req?.cookies?.refreshToken;
 
         if (!refreshToken) throw createError(401, "Unauthorized");
 

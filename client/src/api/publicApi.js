@@ -10,9 +10,7 @@ const publicApi = axios.create({
 })
 
 publicApi.interceptors.response.use(
-    response => response.data,
-    error => {
-        return Promise.reject(error.response ? error.response.data : "Fail to connnect");
-    });
-
+    response => response?.data,
+    error => Promise.reject(error?.response ? error?.response?.data :  { message: "Fail to connnect" })
+)
 export default publicApi;

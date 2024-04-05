@@ -36,9 +36,9 @@ router.post("/sign-in",
 
 router.delete("/sign-out",auth.verifyAccessToken, userController.signOut);
 router.post("/change-password",auth.verifyAccessToken, userController.changePassword);
-router.get("/me", auth.verifyAccessToken ,userController.resetPassword);
 router.post("/refresh", auth.verifyRefreshToken, userController.refreshToken);
 router.post("/forget-password", userController.forgotPassword);
 router.post("/reset-password", userController.resetPassword);
+router.get("/me", auth.verifyAccessToken ,userController.getMe);
 
 module.exports = router;
