@@ -4,6 +4,7 @@ import { getMe } from "~/api/userApi";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "~/store/user/userSlice";
 import { notifyError } from "~/utils/toastify";
+import Loading from "~/components/Loading";
 
 const PrivateRoute = () => {
   const user = useSelector(state => state.user.currentUser);
@@ -32,7 +33,7 @@ const PrivateRoute = () => {
     return () => { isMounted = false }
   },[]);
 
-  if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading) return <Loading />;
 
   return user ? (
     <Outlet />

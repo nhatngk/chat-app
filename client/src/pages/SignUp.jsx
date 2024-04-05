@@ -6,6 +6,7 @@ import InputField from "~/components/InputField";
 import { useNavigate } from "react-router-dom";
 
 import { signUp } from "~/api/userApi";
+import LoadingButton from "~/components/LoadingButton";
 import { notifySuccess, notifyError } from "~/utils/toastify";
 
 
@@ -33,7 +34,7 @@ const schema = yup.object().shape({
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm({
     mode: "onBlur",
     resolver: yupResolver(schema),
   });
@@ -43,7 +44,6 @@ const SignUp = () => {
     try {
       const response = await signUp(user);
       if (response) {
-        setIsLoading(false);
         reset();
         notifySuccess(response.message);
         navigate("/sign-in");
@@ -95,10 +95,11 @@ const SignUp = () => {
           placeholder={"Confirm your password"}
         />
 
-        <button
-          type="submit"
-          className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
-        >Sign up</button>
+        {isSubmitting ? <LoadingButton /> : (
+          <button type="submit"
+            className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
+          >Sign in</button>)
+        }
       </form>
 
       <div className="flex justify-between mt-4">

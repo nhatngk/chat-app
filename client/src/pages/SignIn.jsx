@@ -9,6 +9,8 @@ import { notifySuccess, notifyError } from "~/utils/toastify";
 import { setUser } from "~/store/user/userSlice";
 import { signIn, getMe } from "~/api/userApi";
 import InputField from "~/components/InputField";
+import LoadingButton from "~/components/LoadingButton";
+import Loading from "~/components/Loading";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required!"),
@@ -23,11 +25,12 @@ const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  console.log(location.state?.from?.pathname);
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.currentUser);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { register, handleSubmit, formState: { errors, isSubmitting }, reset } = useForm({
     mode: "onBlur",
     resolver: yupResolver(schema),
   });
@@ -51,13 +54,12 @@ const SignIn = () => {
         const respone = await getMe();
         dispatch(setUser(respone?.user));
       } catch (error) {
-        notifyError(error.message);
       } finally {
         if (isMounted) setIsLoading(false);
       }
     }
 
-    if (!user) {
+    if (!user && !location.state?.from?.pathname) {
       getUser();
     } else {
       setIsLoading(false);
@@ -65,7 +67,7 @@ const SignIn = () => {
     return () => { isMounted = false }
   }, []);
 
-  if (isLoading) return <h1>Loading...</h1>;
+  if (isLoading) return <></>;
 
 
   return user ? <Navigate to={from} replace /> : (
@@ -91,12 +93,11 @@ const SignIn = () => {
           register={register}
           placeholder={"Enter your password"}
         />
-
-        <button type="submit"
-          className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
-          disabled={user.loading}
-        >Sign in</button>
-
+        {isSubmitting ? <LoadingButton /> : (
+          <button type="submit"
+            className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
+          >Sign in</button>)
+        }
       </form>
 
       <div className="flex justify-between mt-4">
