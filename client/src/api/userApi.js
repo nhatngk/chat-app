@@ -17,7 +17,7 @@ export const signIn = async (credentials) => {
 }
 
 export const signOut = async () => {
-    return await publicApi.post(userEndpoints.signOut);
+    return await privateApi.delete(userEndpoints.signOut);
 }
 
 export const refreshToken = async () => {

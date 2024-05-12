@@ -3,6 +3,12 @@ const bcrypt = require('bcrypt');
 const createError = require("http-errors");
 const crypto = require("crypto");
 
+const contactSchema = new mongoose.Schema({
+    contactDetails: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
+    nickname: String,
+    chatRoomId: mongoose.Schema.Types.ObjectId,
+})
+
 const userSchema = new mongoose.Schema({
     email: {
         type: String,
@@ -23,7 +29,7 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        default: ""
+        default: "https://res.cloudinary.com/dyapfpkgr/image/upload/v1713545813/Chat-app/download_jhspvg.png"
     },
     verifyToken: String,
     verifyTokenExpires: Date,
@@ -33,6 +39,16 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    status: {
+        online: { type: Boolean, default: false },
+        lastSeen: Date,
+    },
+    chatRooms: [mongoose.Schema.Types.ObjectId],
+    unreadMessages: [{}],
+    undeliveredMessages: [{}],
+    contacts: [contactSchema],
+
+    //expired if not verified within 7 days
     expireAt: {
         type: Date,
         default: Date.now,

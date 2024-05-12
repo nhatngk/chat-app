@@ -8,7 +8,7 @@ const TogglePassword = (props) => {
     }
 
     return (
-        <button
+        <div
             className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600 "
             onClick={handleToggle}
             type="button"
@@ -16,7 +16,7 @@ const TogglePassword = (props) => {
             {isPasswordVisible ?
                 (< HidePassword />) : (<ShowPassword />)
             }
-        </button>
+        </div>
 
     )
 }

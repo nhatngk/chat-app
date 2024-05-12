@@ -7,7 +7,7 @@ const InputField = (props) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     return (
         <div className="flex flex-col mb-2">
-            <label  
+            <label
                 className="mb-2 font-medium "
                 htmlFor={id}>{label}</label>
             {type === "password" ? (
@@ -25,8 +25,7 @@ const InputField = (props) => {
                 <input
                     {...register(id)}
                     className={`input-form ${errors?.[id]?.message && "outline outline-1 outline-red"}`}
-                    type={type} id={id} placeholder={placeholder}
-                />)
+                    type={type} id={id} placeholder={placeholder}/>)
             }
             <p className="text-red">{errors?.[id]?.message}</p>
         </div>

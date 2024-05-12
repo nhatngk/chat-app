@@ -103,12 +103,8 @@ const SignUp = () => {
       </form>
 
       <div className="flex justify-between mt-4">
-        <button>
           <Link to={"/forgot-password"} className="text-blue font-semibold hover:text-ocean">Forgot Password</Link>
-        </button>
-        <button>
           <Link to={"/sign-in"} className="text-blue font-semibold hover:text-ocean">Sign In</Link>
-        </button>
       </div>
     </div>
   )

@@ -3,8 +3,25 @@
 @tailwind utilities;
 
 @layer components {
-    .input-form {
-      @apply py-2 pl-4 pr-10 w-full bg-slate focus:outline focus:outline-blue rounded-lg;
-    }
+  .input-form {
+    @apply py-2 pl-4 pr-10 w-full bg-slate focus:outline focus:outline-blue rounded-lg;
+  }
 
-} 
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

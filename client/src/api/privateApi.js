@@ -11,16 +11,18 @@ const privateApi = axios.create({
 
 privateApi.interceptors.response.use(
     response => response?.data,
-    error => {
+    async error => {
         const originalRequest = error.config;
 
         if (error?.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-            refreshToken()
-                .then(() => axios(originalRequest))
+            return refreshToken()
+                .then(() => privateApi(originalRequest)) 
                 .catch(error => Promise.reject(error))
         }
+
         return Promise.reject(error?.response ? error?.response?.data : { message: "Fail to connnect" });
+
     });
 
 export default privateApi;

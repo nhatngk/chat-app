@@ -149,7 +149,6 @@ const signIn = async (req, res, next) => {
             {
                 httpOnly: true,
                 maxAge: secret.refresh_token_ttl * 1000,
-                path: "/api/user/refresh"
             }
         )
         return res.status(200).json({
@@ -171,7 +170,7 @@ const signOut = async (req, res) => {
             message: "Sign out successfully"
         })
     } catch (error) {
-
+        next(error);
     }
 }
 
@@ -196,10 +195,10 @@ const resetPassword = async (req, res) => {
     }
 }
 
-const getMe = async (req, res) => {
+const getMe = async (req, res, next) => {
     try {
         const user = req.user;
-        const { id, email, username, avatar, verified } = user.toObject();
+        const { _id: id, email, username, avatar, verified } = user.toObject();
 
         const userData = { id, email, username, avatar, verified };
 
@@ -207,6 +206,7 @@ const getMe = async (req, res) => {
             user: userData
         })
     } catch (error) {
+        next(error);
     }
 }
 
@@ -233,7 +233,6 @@ const refreshToken = async (req, res) => {
             {
                 httpOnly: true,
                 expires: new Date(exp * 1000),
-                path: "/api/user/refresh"
             }
         )
 
@@ -241,17 +240,28 @@ const refreshToken = async (req, res) => {
             message: "Refresh successfully"
         })
     } catch (error) {
+        next(error);
+    }
+}
+
+const updateProfile = async (req, res, next) => {
+    try {
+        
+    } catch (error) {
+        next(error);
     }
 }
 
 module.exports = {
     signUp,
     verifyEmail,
+    confirmEmail,
     signIn,
     signOut,
     changePassword,
     forgotPassword,
     resetPassword,
     getMe,
-    refreshToken
+    refreshToken,
+    updateProfile
 }

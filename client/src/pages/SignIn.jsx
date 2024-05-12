@@ -25,7 +25,6 @@ const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-  console.log(location.state?.from?.pathname);
   const dispatch = useDispatch();
   const user = useSelector(state => state.user.currentUser);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,7 +42,7 @@ const SignIn = () => {
       reset();
       navigate(from, { replace: true });
     } catch (error) {
-      notifyError(user.error);
+      notifyError(error.message);
     }
   };
 
@@ -54,6 +53,7 @@ const SignIn = () => {
         const respone = await getMe();
         dispatch(setUser(respone?.user));
       } catch (error) {
+        console.log(error);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -101,12 +101,8 @@ const SignIn = () => {
       </form>
 
       <div className="flex justify-between mt-4">
-        <button>
-          <Link to={"/forgot-password"} className="text-blue font-semibold hover:text-ocean">Forgot Password</Link>
-        </button>
-        <button>
-          <Link to={"/sign-up"} className="text-blue font-semibold hover:text-ocean">Sign up</Link>
-        </button>
+        <Link to={"/forgot-password"} className="text-blue font-semibold hover:text-ocean">Forgot Password</Link>
+        <Link to={"/sign-up"} className="text-blue font-semibold hover:text-ocean">Sign up</Link>
       </div>
     </div>
 

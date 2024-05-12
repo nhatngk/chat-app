@@ -21,7 +21,6 @@ router.post(
     userController.signUp
 );
 
-router.post("/verify", userController.verifyEmail);
 
 router.post("/sign-in",
     body("email")
@@ -34,11 +33,23 @@ router.post("/sign-in",
     validate,
     userController.signIn);
 
-router.delete("/sign-out",auth.verifyAccessToken, userController.signOut);
-router.post("/change-password",auth.verifyAccessToken, userController.changePassword);
+router.delete("/sign-out", auth.verifyAccessToken, userController.signOut);
+
+router.post("/change-password", auth.verifyAccessToken, userController.changePassword);
+
+router.get("/me", auth.verifyAccessToken, userController.getMe);
+
 router.post("/refresh", auth.verifyRefreshToken, userController.refreshToken);
-router.post("/forget-password", userController.forgotPassword);
+
+router.post("/update-profile", auth.verifyAccessToken, userController.updateProfile);
+
+router.post("/verify", userController.verifyEmail);
+
+router.post("/confirm-email", userController.confirmEmail);
+
+router.post("/forgot-password", userController.forgotPassword);
+
 router.post("/reset-password", userController.resetPassword);
-router.get("/me", auth.verifyAccessToken ,userController.getMe);
+
 
 module.exports = router;
