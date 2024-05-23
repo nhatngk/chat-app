@@ -16,8 +16,8 @@ const PrivateRoute = () => {
     let isMounted = true;
     const getUser = async () => {
       try {
-        const respone = await getMe();
-        dispatch(setUser(respone?.user));
+        const response = await getMe();
+        dispatch(setUser(response?.user));
       } catch (error) {
         notifyError(error.message);
       } finally {

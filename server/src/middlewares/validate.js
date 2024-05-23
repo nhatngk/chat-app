@@ -5,7 +5,7 @@ const validate = (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        next(createError(401,{message:  errors.array()}));
+        next(createError(401,{message:  errors.array()[0].msg}));
     }
     next();
 };

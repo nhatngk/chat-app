@@ -30,7 +30,6 @@ const verifyAccessToken = async (req, res, next) => {
         if (!user) throw createError(401, "Unauthorized");
 
         req.user = user;
-
         next();
 
     } catch (error) {

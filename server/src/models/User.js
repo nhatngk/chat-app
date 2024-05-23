@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
-        default: "https://res.cloudinary.com/dyapfpkgr/image/upload/v1713545813/Chat-app/download_jhspvg.png"
+        default: "https://res.cloudinary.com/dyapfpkgr/image/upload/v1715022080/Chat-app/download_b5rilg.jpg"
     },
     verifyToken: String,
     verifyTokenExpires: Date,
@@ -61,11 +61,11 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 })
 
-userSchema.methods.hashPassword = async function () {
+userSchema.methods.hashPassword = async function (password = this.password) {
     try {
         const saltRounds = 10;
         const salt = await bcrypt.genSalt(saltRounds);
-        this.password = await bcrypt.hash(this.password, salt);
+        this.password = await bcrypt.hash(password, salt);
     } catch (err) {
         throw createError(500, { message: err });
     }
@@ -83,11 +83,19 @@ userSchema.methods.generateVerifyToken = async function () {
     const expirationDate = new Date();
     expirationDate.setMinutes(expirationDate.getMinutes() + 15);
 
-    this.verifyToken = crypto.randomBytes(32).toString("hex");
+    this.verifyToken = await crypto.randomBytes(32).toString("hex");
     this.verifyTokenExpires = expirationDate;
 
     return this.verifyToken;
 };
+
+userSchema.methods.generateForgotPasswordToken = async function () {
+    const expirationDate = new Date();
+    expirationDate.setMinutes(expirationDate.getMinutes() + 15);
+    this.forgotPasswordToken = await crypto.randomBytes(32).toString("hex");
+    this.forgotPasswordTokenExpires = expirationDate;
+    return this.forgotPasswordToken;
+}
 
 
 

@@ -12,30 +12,26 @@ const signUp = async (req, res, next) => {
         const checkEmailExist = await Users.findOne({ email });
         if (checkEmailExist) throw createError(400, "Email is already used.");
 
-        const checkUsername = await Users.findOne({ username });
-        if (checkUsername) throw createError(400, "Username is already used.");
-
         const newUser = new Users(req.body);
 
         await newUser.hashPassword();
 
-        const token = newUser.generateVerifyToken();
+        const token = await newUser.generateVerifyToken();
 
         await newUser.save();
 
         const mailData = {
             from: secret.email_user,
             to: `${req.body.email}`,
-            subject: "Active account",
             subject: "Verify your email",
             html: `<h2>Hello ${username}</h2>
-            <p>Verify your email address to complete the signup and login into your <strong>Kanban</strong> account.</p>
+            <p>Verify your email address to complete the signup and login into your <strong>Chat App</strong> account.</p>
       
             <p>This link will expire in <strong> 15 minute</strong>.</p>
               
-            <p style="margin-bottom:20px;">Click this link for active your account</p>
+            <p style="margin-bottom:20px;">Click this link to active your account</p>
 
-            <a href="${secret.client_url}/email-verify/${token}" 
+            <a href="${secret.client_url}/confirm-email/${token}" 
                style="background:#22c55e;color:white;border:1px solid #22c55e; padding: 10px 15px; border-radius: 4px; text-decoration:none;"
             >Verify Account</a>
 
@@ -43,38 +39,35 @@ const signUp = async (req, res, next) => {
             support@example.com</p>
               
             <p style="margin-bottom:0px;">Thank you.</p>
-            <strong>Kanban Team</strong>`,
+            <strong>Chat App</strong>`,
         };
-        await sendEmail(res, mailData);
-    } catch (err) {
-        next(err);
+        const message = "Sign up success! Please check your email to active your account.";
+        await sendEmail(res, mailData, message);
+    } catch (error) {
+        next(error);
     }
 }
 
-const verifyEmail = async (req, res) => {
+const verifyEmail = async (req, res, next) => {
     try {
-        const { email } = req.body;
+        const user =  req.user;
+        if(user.verified) throw createError(400, "Your account is already verified!");
+        const verifyToken = await user.generateVerifyToken();
 
-        const user = await Users.findOne({ email });
-        if (!user) throw createError(404, "User not found!");
-
-        const token = newUser.generateVerifyToken();
-
-        await newUser.save();
+        await user.save();
 
         const mailData = {
             from: secret.email_user,
-            to: `${email}`,
-            subject: "Active account",
+            to: `${user.email}`,
             subject: "Verify your email",
             html: `<h2>Hello ${user.username}</h2>
-            <p>Verify your email address to complete the signup and login into your <strong>Kanban</strong> account.</p>
+            <p>Verify your email address to complete the signup and login into your <strong>Chat App</strong> account.</p>
       
             <p>This link will expire in <strong> 15 minute</strong>.</p>
               
-            <p style="margin-bottom:20px;">Click this link for active your account</p>
+            <p style="margin-bottom:20px;">Click this link to active your account</p>
 
-            <a href="${secret.client_url}/email-verify/${token}" 
+            <a href="${secret.client_url}/confirm-email/${verifyToken}" 
                style="background:#22c55e;color:white;border:1px solid #22c55e; padding: 10px 15px; border-radius: 4px; text-decoration:none;"
             >Verify Account</a>
 
@@ -82,21 +75,20 @@ const verifyEmail = async (req, res) => {
             support@example.com</p>
               
             <p style="margin-bottom:0px;">Thank you.</p>
-            <strong>Kanban Team</strong>`,
+            <strong>Chat App</strong>`,
         };
 
         const message = "Please check email to verify your account!";
-        sendEmail(mailData, res, message);
+        await sendEmail(res, mailData, message);
     } catch (err) {
         next(err);
     }
 }
 
-const confirmEmail = async (req, res) => {
+const confirmEmail = async (req, res, next) => {
     try {
-        const { token } = req.param;
-
-        const user = await Users.findOne({ verifyToken: token });
+        const verifyToken = req.params.token;
+        const user = await Users.findOne({ verifyToken });
         if (!user) throw createError(400, "Invalid verify token!");
 
         const expired = new Date() > new Date(user.verifyTokenExpires);
@@ -108,7 +100,7 @@ const confirmEmail = async (req, res) => {
 
         await user.save({ validateBeforeSave: false });
 
-        return res.status(200).json("Verify email successfully!")
+        return res.status(200).json({message: "Verify email successfully!"})
     } catch (err) {
         next(err);
     }
@@ -153,7 +145,7 @@ const signIn = async (req, res, next) => {
         )
         return res.status(200).json({
             user: userData,
-            message: "Login successfully"
+            message: "Sign in successfully"
         })
 
     } catch (err) {
@@ -161,7 +153,7 @@ const signIn = async (req, res, next) => {
     }
 }
 
-const signOut = async (req, res) => {
+const signOut = async (req, res, next) => {
     try {
         client.del(req.user.id);
         res.clearCookie("accessToken");
@@ -174,24 +166,79 @@ const signOut = async (req, res) => {
     }
 }
 
-const forgotPassword = async (req, res) => {
+const forgotPassword = async (req, res, next) => {
     try {
-        res.send("Login successfully!");
+        const { email } = req.body;
+        const user = await Users.findOne({ email });
+        if (!user) throw createError(404, "Not found any account with this email!");
+
+        const forgotPasswordToken = await user.generateForgotPasswordToken();
+        
+        await user.save();
+
+        const mailData = {
+            from: secret.email_user,
+            to: `${email}`,
+            subject: "Reset your password",
+            html: `<h2>Hello ${user.username}</h2>
+            <p>Reset your password <strong>Chat App</strong> account.</p>
+      
+            <p>This link will expire in <strong> 15 minute</strong>.</p>
+              
+            <p style="margin-bottom:20px;">Click this link to reset your password</p>
+
+            <a href="${secret.client_url}/reset-password/${forgotPasswordToken}" 
+               style="background:#22c55e;color:white;border:1px solid #22c55e; padding: 10px 15px; border-radius: 4px; text-decoration:none;"
+            >Reset Your Password </a>
+
+            <p style="margin-top: 35px;"If you did not initiate this request, please contact us immediately at
+            support@example.com</p>
+              
+            <p style="margin-bottom:0px;">Thank you.</p>
+            <strong>Chat App</strong>`,
+        };
+
+        const message = "Please check email to reset your password!";
+        await sendEmail(res, mailData, message);
+
     } catch (error) {
+        next(error);
     }
 }
 
-const changePassword = async (req, res) => {
+const changePassword = async (req, res, next) => {
     try {
-        res.send("Login successfully!");
+        const user = req.user;
+        const { password, newPassword } = req.body;
+
+        const match = await user.comparePassword(password);
+        if(!match) throw createError(400, "Password is incorrect");
+        await user.hashPassword(newPassword);
+        await user.save();
+        res.status(200).json({message: "Change password successfully!"});
     } catch (error) {
+        next(error);
     }
 }
 
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
     try {
-        res.send("Login successfully!");
+        const forgotPasswordToken = req.params.token;
+        const user = await Users.findOne({ forgotPasswordToken });
+        if(!user) throw createError(404, "Invalid token!");
+
+        const expired = new Date() > new Date(user.forgotPasswordTokenExpires);
+        if (expired) throw createError(400, "Token is expired");
+
+        const { newPassword } = req.body;
+        user.forgotPasswordToken = null;
+        user.forgotPasswordTokenExpires = null;
+        await user.hashPassword(newPassword);
+        await user.save();
+
+        return res.status(200).json( {message: "Password resets successfully!"})
     } catch (error) {
+        next(error);
     }
 }
 
@@ -210,7 +257,7 @@ const getMe = async (req, res, next) => {
     }
 }
 
-const refreshToken = async (req, res) => {
+const refreshToken = async (req, res, next) => {
     try {
         const { userId, exp } = req;
 
@@ -246,7 +293,12 @@ const refreshToken = async (req, res) => {
 
 const updateProfile = async (req, res, next) => {
     try {
-        
+        const user = req.user;
+        const { username, avatar } = req.body;
+        user.username = username;
+        user.avatar = avatar;
+        await user.save();
+        res.status(200).json({message: "Update profile successfully!"});
     } catch (error) {
         next(error);
     }

@@ -36,8 +36,8 @@ const SignIn = () => {
 
   const onSubmit = async (data) => {
     try {
-      const respone = await signIn(data);
-      dispatch(setUser(respone.user));
+      const response = await signIn(data);
+      dispatch(setUser(response.user));
       notifySuccess("Login successfully!");
       reset();
       navigate(from, { replace: true });
@@ -50,8 +50,8 @@ const SignIn = () => {
     let isMounted = true;
     const getUser = async () => {
       try {
-        const respone = await getMe();
-        dispatch(setUser(respone?.user));
+        const response = await getMe();
+        dispatch(setUser(response?.user));
       } catch (error) {
         console.log(error);
       } finally {

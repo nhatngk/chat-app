@@ -35,7 +35,16 @@ router.post("/sign-in",
 
 router.delete("/sign-out", auth.verifyAccessToken, userController.signOut);
 
-router.post("/change-password", auth.verifyAccessToken, userController.changePassword);
+router.post("/change-password",
+    auth.verifyAccessToken,
+    body("password")
+        .exists().withMessage("Password is required.")
+        .isLength({ min: 6 }).withMessage("Password must have at least 6 characters."),
+    body("newPassword")
+        .exists().withMessage("New password is required.")
+        .isLength({ min: 6 }).withMessage("Password must have at least 6 characters."),
+    validate,
+    userController.changePassword);
 
 router.get("/me", auth.verifyAccessToken, userController.getMe);
 
@@ -43,13 +52,24 @@ router.post("/refresh", auth.verifyRefreshToken, userController.refreshToken);
 
 router.post("/update-profile", auth.verifyAccessToken, userController.updateProfile);
 
-router.post("/verify", userController.verifyEmail);
+router.post("/verify", auth.verifyAccessToken, userController.verifyEmail);
 
-router.post("/confirm-email", userController.confirmEmail);
+router.post("/confirm-email/:token", userController.confirmEmail);
 
-router.post("/forgot-password", userController.forgotPassword);
+router.post("/forgot-password",
+    body("email")
+        .exists().withMessage("Email is required.")
+        .notEmpty().withMessage("Email must not be left blank.")
+        .isEmail().withMessage("Invalid email format."),
+    validate,
+        userController.forgotPassword);
 
-router.post("/reset-password", userController.resetPassword);
+router.post("/reset-password/:token",
+    body("newPassword")
+        .exists().withMessage("New password is required.")
+        .isLength({ min: 6 }).withMessage("Password must have at least 6 characters."),
+    validate,
+    userController.resetPassword);
 
 
 module.exports = router;

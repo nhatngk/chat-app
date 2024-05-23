@@ -1,10 +1,12 @@
 import { useState } from "react";
+import EmojiPicker from "emoji-picker-react";
 import SendMessage from "~/assets/svg/SendMessage";
 import Like from "~/assets/svg/Like";
 import EmojiPickerButton from "~/assets/svg/EmojiPickerButton";
 import Attach from "~/assets/svg/Attach";
 import Voice from "~/assets/svg/Voice";
-import EmojiPicker from "emoji-picker-react";
+import HoverInfo from "../HoverInfo";
+
 
 const Footer = () => {
     const [isOverflow, setIsOverflow] = useState(false);
@@ -27,13 +29,20 @@ const Footer = () => {
 
     return (
         <div className={`flex flex-row px-3 py-[10px] w-full absolute bottom-0  ${isMultiLine ? "items-end" : "items-center"}`}>
-            <div className={`flex items-center`}>
-                <div className={`mx-1 ${isMultiLine ? "mb-[6px]" : ""}`}>
-                    <Attach />
+            <div className="flex items-center">
+                <div className={`hover-circle size-9 flex items-center justify-center ${isMultiLine ? "mb-[2px]" : ""}`}>
+                    <div className="parent">
+                        <Attach />
+                        <HoverInfo text="Attach file" direction="top" />
+                    </div>
                 </div>
 
-                <div className={`mx-1 ${isMultiLine ? "mb-[6px]" : ""}`}>
-                    <Voice />
+                <div className={`hover-circle size-9 flex items-center justify-center ${isMultiLine ? "mb-[2px]" : ""} `}>
+                    <div className="parent">
+                        <Voice />
+
+                        <HoverInfo text="Voice" direction="top" />
+                    </div>
                 </div>
             </div>
 
@@ -46,9 +55,12 @@ const Footer = () => {
                         ${isOverflow ? "overflow-y-scroll" : "overflow-hidden"}`}
                 />
 
-                <div className="absolute bottom-[16px] right-0 translate-y-[50%] mx-1" >
-                    <button onClick={handlePickEmoji} className="relative" >
-                        <EmojiPickerButton />
+                <div className={`absolute right-0 translate-y-[50%] ${isMultiLine ? "bottom-5" : "bottom-[50%] "} `}>
+                    <button onClick={handlePickEmoji} className="relative hover-circle size-8  flex items-center justify-center hover:bg-[#c2bbbb]" >
+                        <div className="parent">
+                            <EmojiPickerButton />
+                            <HoverInfo text="Pick emoji" direction="top" />
+                        </div>
                         <div className="absolute top-[-320px] right-[0px]">
                             <EmojiPicker
                                 open={isPickingEmoji}
@@ -59,7 +71,7 @@ const Footer = () => {
                                 perRow={8}
                                 emojiSize={20}
                                 emojiStyle="facebook"
-                                previewConfig ={{
+                                previewConfig={{
                                     showPreview: false
                                 }}
                             />
@@ -68,14 +80,24 @@ const Footer = () => {
                 </div>
             </div>
 
-            <div className="flex">
+            <div className="">
                 {
                     data?.message ? (
-                        <div className={` ${isMultiLine ? "mb-[8px]" : ""}`}>
-                            <SendMessage />
+                        <div className={`${isMultiLine ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}>
+                            <div className="parent">
+                                <SendMessage />
+                                <HoverInfo text="Press to send" direction="send" />
+                            </div>
+
                         </div>
                     ) : (
-                        <Like />)
+                        <div className="hover-circle size-9 flex items-center justify-center ">
+                            <div className="parent ">
+                                <Like />
+                                <HoverInfo text="Send like" direction="send" />
+                            </div>
+                        </div>
+                    )
                 }
             </div>
         </div>

@@ -1,11 +1,10 @@
-const Avatar = (props) => {
-    const { srcImg, size } = props;
+const Avatar = ({ srcImg, size }) => {
     return (
         <div>
             <img
                 src={srcImg}
                 alt="avatar"
-                className= {`rounded-full size-${size}`}
+                className= {`rounded-full size-12 size-${size}`}
             />
         </div>
     )

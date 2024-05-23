@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 const creeatError = require("http-errors");
 const secret = require("../config/env");
 
-const sendEmail = async (res, body) => {
+const sendEmail = async (res, body, message) => {
   const transporter = nodemailer.createTransport({
     host: secret.email_host,
     service: secret.email_service,
@@ -20,7 +20,7 @@ const sendEmail = async (res, body) => {
 
   await transporter.sendMail(body, (err, data) => {
     if (err) throw creeatError(500, `Error happen when sending email!`)
-    return res.status(201).json({ message: "Please check email to verify your account!" })
+    return res.status(201).json({ message })
   });
 }
 
