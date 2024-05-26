@@ -7,15 +7,14 @@ import Attach from "~/assets/svg/Attach";
 import Voice from "~/assets/svg/Voice";
 import HoverInfo from "../HoverInfo";
 
-
 const Footer = () => {
     const [isOverflow, setIsOverflow] = useState(false);
     const [isMultiLine, setIsMultiLine] = useState(false);
-    const [isPickingEmoji, setIsPickingEmoji] = useState(false);
-    const [data, setData] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [data, setData] = useState({text: ""});
 
     const handleOnChange = (e) => {
-        setData({ ...data, message: e.target.value });
+        setData((prev) => ({ ...prev, text: e.target.value }));
         e.target.style.height = 'auto';
         const newHeight = e.target.scrollHeight;
         setIsMultiLine(newHeight > 30);
@@ -23,12 +22,17 @@ const Footer = () => {
         e.target.style.height = e.target.scrollHeight + 'px';
     }
 
-    const handlePickEmoji = () => {
-        setIsPickingEmoji(!isPickingEmoji);
+    const handleOnClick = () => {
+        setOpen(!open);
+    }
+
+    const handleEmojiClick = (emoji) => {
+        setData((prev) => ({ ...prev, text: prev.text + emoji.emoji }));
+        setOpen(false);
     }
 
     return (
-        <div className={`flex flex-row px-3 py-[10px] w-full absolute bottom-0  ${isMultiLine ? "items-end" : "items-center"}`}>
+        <div className={`flex flex-row px-3 pb-[10px] pt-1 w-full bottom-0 ${isMultiLine ? "items-end" : "items-center"}`}>
             <div className="flex items-center">
                 <div className={`hover-circle size-9 flex items-center justify-center ${isMultiLine ? "mb-[2px]" : ""}`}>
                     <div className="parent">
@@ -40,7 +44,6 @@ const Footer = () => {
                 <div className={`hover-circle size-9 flex items-center justify-center ${isMultiLine ? "mb-[2px]" : ""} `}>
                     <div className="parent">
                         <Voice />
-
                         <HoverInfo text="Voice" direction="top" />
                     </div>
                 </div>
@@ -49,22 +52,23 @@ const Footer = () => {
             <div className="w-full flex flex-row relative mx-2 bg-[#f0f2f5] rounded-3xl p-2">
                 <textarea
                     onChange={handleOnChange}
+                    value={data?.text}
                     rows="1" cols="50"
                     placeholder="Aa"
-                    className={`max-h-36 resize-none w-full mx-6 outline-none bg-[#f0f2f5] 
+                    className={`max-h-36 resize-none w-full mx-3 mr-6 pr-2 outline-none bg-[#f0f2f5] 
                         ${isOverflow ? "overflow-y-scroll" : "overflow-hidden"}`}
                 />
 
                 <div className={`absolute right-0 translate-y-[50%] ${isMultiLine ? "bottom-5" : "bottom-[50%] "} `}>
-                    <button onClick={handlePickEmoji} className="relative hover-circle size-8  flex items-center justify-center hover:bg-[#c2bbbb]" >
+                    <div onClick={handleOnClick} className="relative hover-circle size-8  flex items-center justify-center hover:bg-[#c2bbbb]" >
                         <div className="parent">
                             <EmojiPickerButton />
                             <HoverInfo text="Pick emoji" direction="top" />
                         </div>
                         <div className="absolute top-[-320px] right-[0px]">
                             <EmojiPicker
-                                open={isPickingEmoji}
-                                // onEmojiSelect={handleEmojiSelect}
+                                open={open}
+                                onEmojiClick={handleEmojiClick}
                                 width={300}
                                 height={300}
                                 rows={5}
@@ -76,17 +80,17 @@ const Footer = () => {
                                 }}
                             />
                         </div>
-                    </button>
+                    </div>
                 </div>
             </div>
 
             <div className="">
                 {
-                    data?.message ? (
+                    data?.text ? (
                         <div className={`${isMultiLine ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}>
                             <div className="parent">
                                 <SendMessage />
-                                <HoverInfo text="Press to send" direction="send" />
+                                <HoverInfo text="Press to send" direction="top-left" />
                             </div>
 
                         </div>
@@ -94,7 +98,7 @@ const Footer = () => {
                         <div className="hover-circle size-9 flex items-center justify-center ">
                             <div className="parent ">
                                 <Like />
-                                <HoverInfo text="Send like" direction="send" />
+                                <HoverInfo text="Send like" direction="top-left" />
                             </div>
                         </div>
                     )

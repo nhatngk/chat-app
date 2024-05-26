@@ -16,7 +16,7 @@ const voiceDetailsSchema = new mongoose.Schema({
 const MessageSchema = new mongoose.Schema({
   messageType: {
     type: String,
-    enum: ["text", "image", "call", "voice", "document", "notification",],
+    enum: ["text", "image", "call", "voice", "document", "notification", "like"],
   },
   sender: {
     type: mongoose.Schema.Types.ObjectId,
@@ -34,7 +34,7 @@ const MessageSchema = new mongoose.Schema({
   },
   undeliveredMembers: [mongoose.Schema.Types.ObjectId],
   unreadMembers: [mongoose.Schema.Types.ObjectId],
-  message: String,
+  text: String,
   imageUrl: String,
   documentUrl: String,
   callDetails: callDetailsSchema,

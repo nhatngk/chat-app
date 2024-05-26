@@ -3,9 +3,8 @@ const bcrypt = require('bcrypt');
 const createError = require("http-errors");
 const crypto = require("crypto");
 
-const contactSchema = new mongoose.Schema({
-    contactDetails: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
-    nickname: String,
+const friendSchema = new mongoose.Schema({
+    friendId: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     chatRoomId: mongoose.Schema.Types.ObjectId,
 })
 
@@ -19,7 +18,6 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true,
         trim: true
     },
     password: {
@@ -46,8 +44,7 @@ const userSchema = new mongoose.Schema({
     chatRooms: [mongoose.Schema.Types.ObjectId],
     unreadMessages: [{}],
     undeliveredMessages: [{}],
-    contacts: [contactSchema],
-
+    friends: [friendSchema],
     //expired if not verified within 7 days
     expireAt: {
         type: Date,

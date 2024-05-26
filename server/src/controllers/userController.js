@@ -118,9 +118,9 @@ const signIn = async (req, res, next) => {
 
         if (!match) throw createError(400, "Email or password is incorrect");
 
-        const { id, email: userEmail, username, avatar, verified } = user.toObject();
+        const { _id: id, username, avatar, verified } = user.toObject();
 
-        const userData = { id, email: userEmail, username, avatar, verified }
+        const userData = { id, email, username, avatar, verified }
 
         const accessToken = jwt.generateAccessToken(user.id);
 

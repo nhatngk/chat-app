@@ -4,7 +4,7 @@ import Footer from "./Footer"
 
 const ChatArea = () => {
   return (
-    <div className="h-full flex flex-col w-full relative">
+    <div className="h-full flex flex-col w-full"> 
         <Header />
         <Conversation />
         <Footer />
