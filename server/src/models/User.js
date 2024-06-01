@@ -4,7 +4,7 @@ const createError = require("http-errors");
 const crypto = require("crypto");
 
 const friendSchema = new mongoose.Schema({
-    friendId: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
+    details: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     chatRoomId: mongoose.Schema.Types.ObjectId,
 })
 
@@ -94,6 +94,6 @@ userSchema.methods.generateForgotPasswordToken = async function () {
     return this.forgotPasswordToken;
 }
 
-
+userSchema.index({ username: 'text'});
 
 module.exports = mongoose.model("Users", userSchema)  

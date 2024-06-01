@@ -52,7 +52,6 @@ const ConfirmEmail = () => {
         if (isMounted) setIsLoading(false);
       }
     }
-
     confirm();
 
     return () => { isMounted = false }

@@ -25,7 +25,7 @@ const Message = ({ message, direction, order }) => {
 
   return (
     <div className={`flex items-center gap-2 ${direction === 'send' ? 'flex-row-reverse' : ''}`}>
-      <div className={`${(direction === 'receive' && (order === 'last' || order === 'single')) ? 'flex' : 'hidden'}`}>
+      <div className={`${(direction === 'receive' ? "flex" : "hidden")} ${(order === 'last' || order === 'single') ? 'flex' : 'invisible'}`}>
         <Avatar srcImg="https://res.cloudinary.com/dyapfpkgr/image/upload/v1715022080/Chat-app/download_b5rilg.jpg" size="7" />
       </div>
 

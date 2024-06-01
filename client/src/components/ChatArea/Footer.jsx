@@ -8,7 +8,6 @@ import Voice from "~/assets/svg/Voice";
 import HoverInfo from "../HoverInfo";
 
 const Footer = () => {
-    const [isOverflow, setIsOverflow] = useState(false);
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [open, setOpen] = useState(false);
     const [data, setData] = useState({text: ""});
@@ -18,7 +17,6 @@ const Footer = () => {
         e.target.style.height = 'auto';
         const newHeight = e.target.scrollHeight;
         setIsMultiLine(newHeight > 30);
-        setIsOverflow(newHeight > 144);
         e.target.style.height = e.target.scrollHeight + 'px';
     }
 
@@ -55,8 +53,7 @@ const Footer = () => {
                     value={data?.text}
                     rows="1" cols="50"
                     placeholder="Aa"
-                    className={`max-h-36 resize-none w-full mx-3 mr-6 pr-2 outline-none bg-[#f0f2f5] 
-                        ${isOverflow ? "overflow-y-scroll" : "overflow-hidden"}`}
+                    className={`max-h-36 resize-none w-full mx-3 mr-6 pr-2 outline-none bg-[#f0f2f5] overflow-auto "}`}
                 />
 
                 <div className={`absolute right-0 translate-y-[50%] ${isMultiLine ? "bottom-5" : "bottom-[50%] "} `}>

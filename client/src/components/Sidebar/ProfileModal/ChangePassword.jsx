@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setUser } from "~/store/user/userSlice";
+import { setUser } from "~/store/userSlice";
 
 import { notifySuccess, notifyError } from "~/utils/toastify";
 import { changePassword, signOut } from "~/api/userApi";

@@ -4,14 +4,14 @@ import Message from "./Message"
 const Messages = [
   {
     id: 1,
-    sender: "66464db95eb268c620d61ea6",
+    sender: "66589ecea1f5eadbeb4de28c",
     text: "Hello, how are you?",
     messageType: "text",
     timeSent: "10:00"
   },
   {
     id: 2,
-    sender: "66464db95eb268c620d61ea6",
+    sender: "66589ecea1f5eadbeb4de28c",
     text: "Hello, how are you?",
     messageType: "text",
     timeSent: "10:00"
@@ -24,25 +24,19 @@ const Messages = [
     timeSent: "10:00"
   },
   {
-    id: 10,
-    sender: "66464db95eb268c620d61ea6",
-    text: "Hello, how are you?",
-    messageType: "text",
-    timeSent: "10:00"
-  },
-  {
     id: 4,
-    sender: "66464db95eb268c620d61ea6",
+    sender: "66589ecea1f5eadbeb4de28c",
     text: "Hello, how are you?",
     messageType: "text",
     timeSent: "10:00"
   }, {
     id: 5,
-    sender: "66464db95eb268c620d61ea6",
+    sender: "66589ecea1f5eadbeb4de28c",
     text: "Hello, how are you?",
     messageType: "text",
     timeSent: "10:00"
-  }, {
+  }, 
+  {
     id: 6,
     sender: "66464db95eb268c620d61ea7",
     text: "Hello, how are you?",
@@ -51,16 +45,45 @@ const Messages = [
   },
   {
     id: 7,
-    sender: "66464db95eb268c620d61ea6",
+    sender: "66464db95eb268c620d61ea7",
+    text: "Hello, how are you?",
+    messageType: "text",
+    timeSent: "10:00"
+  },
+  {
+    id: 8,
+    sender: "66464db95eb268c620d61ea7",
+    text: "Hello, how are you?",
+    messageType: "text",
+    timeSent: "10:00"
+  },
+  {
+    id: 9,
+    sender: "66589ecea1f5eadbeb4de28c",
     text: "Hello, how are you?",
     messageType: "text",
     timeSent: "10:00",
   },
   {
     id: 11,
-    sender: "66464db95eb268c620d61ea6",
+    sender: "66589ecea1f5eadbeb4de28c",
     messageType: "image",
     imageUrl: "https://static.vecteezy.com/system/resources/previews/025/220/125/non_2x/picture-a-captivating-scene-of-a-tranquil-lake-at-sunset-ai-generative-photo.jpg",
+    timeSent: "10:00"
+  },
+  {
+    id: 12,
+    sender: "66589ecea1f5eadbeb4de28",
+    text: "Hello, how are you?",
+    messageType: "text",
+    timeSent: "10:00",
+  },
+  {
+    id: 10
+    ,
+    sender: "66589ecea1f5eadbeb4de28c",
+    text: "Hello, how are you?",
+    messageType: "text",
     timeSent: "10:00"
   },
 ]
@@ -69,7 +92,7 @@ const Conversation = () => {
   const currentUser = useSelector(state => state.user.currentUser)
 
   return (
-    <div className='flex flex-col py-2 px-4 gap-[2px] overflow-y-scroll '>
+    <div className='flex h-full w-full flex-col py-2 px-4 gap-[2px] overflow-y-auto '>
       {
         Messages.map((message, index) => {
           let order = null;

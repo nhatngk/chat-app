@@ -2,7 +2,7 @@ import { Navigate, useLocation, Outlet } from "react-router-dom"
 import { useEffect, useState } from "react";
 import { getMe } from "~/api/userApi";
 import { useSelector, useDispatch } from "react-redux";
-import { setUser } from "~/store/user/userSlice";
+import { setUser } from "~/store/userSlice";
 import { notifyError } from "~/utils/toastify";
 import Loading from "~/components/Loading";
 

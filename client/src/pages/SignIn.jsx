@@ -6,7 +6,7 @@ import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { notifySuccess, notifyError } from "~/utils/toastify";
-import { setUser } from "~/store/user/userSlice";
+import { setUser } from "~/store/userSlice";
 import { signIn, getMe } from "~/api/userApi";
 import InputField from "~/components/InputField";
 import LoadingButton from "~/components/LoadingButton";
@@ -71,7 +71,8 @@ const SignIn = () => {
 
 
   return user ? <Navigate to={from} replace /> : (
-    <div className="max-w-96 mx-auto my-20 shadow-form px-8 py-10 rounded-xl">
+    <div className="flex items-center justify-center min-h-screen">
+    <div className="min-w-96 mx-auto my-20 shadow-form px-8 py-10 rounded-xl">
       <h1
         className="text-center text-3xl font-bold mb-4"
       >Sign in</h1>
@@ -104,6 +105,7 @@ const SignIn = () => {
         <Link to={"/forgot-password"} className="text-blue font-semibold hover:text-ocean">Forgot Password</Link>
         <Link to={"/sign-up"} className="text-blue font-semibold hover:text-ocean">Sign up</Link>
       </div>
+    </div>
     </div>
 
   )

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 
-import { notifyError, notifySuccess } from "~/utils/toastify";
 import { verify } from "~/api/userApi";
+import { notifyError, notifySuccess } from "~/utils/toastify";
 
 const VerifyAccount = () => {
   const { handleSubmit, formState: { isSubmitting } } = useForm();

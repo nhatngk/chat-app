@@ -50,8 +50,8 @@ const signUp = async (req, res, next) => {
 
 const verifyEmail = async (req, res, next) => {
     try {
-        const user =  req.user;
-        if(user.verified) throw createError(400, "Your account is already verified!");
+        const user = req.user;
+        if (user.verified) throw createError(400, "Your account is already verified!");
         const verifyToken = await user.generateVerifyToken();
 
         await user.save();
@@ -100,7 +100,7 @@ const confirmEmail = async (req, res, next) => {
 
         await user.save({ validateBeforeSave: false });
 
-        return res.status(200).json({message: "Verify email successfully!"})
+        return res.status(200).json({ message: "Verify email successfully!" })
     } catch (err) {
         next(err);
     }
@@ -120,7 +120,7 @@ const signIn = async (req, res, next) => {
 
         const { _id: id, username, avatar, verified } = user.toObject();
 
-        const userData = { id, email, username, avatar, verified }
+        const userData = { id, email, username, avatar, verified };
 
         const accessToken = jwt.generateAccessToken(user.id);
 
@@ -173,7 +173,7 @@ const forgotPassword = async (req, res, next) => {
         if (!user) throw createError(404, "Not found any account with this email!");
 
         const forgotPasswordToken = await user.generateForgotPasswordToken();
-        
+
         await user.save();
 
         const mailData = {
@@ -212,10 +212,10 @@ const changePassword = async (req, res, next) => {
         const { password, newPassword } = req.body;
 
         const match = await user.comparePassword(password);
-        if(!match) throw createError(400, "Password is incorrect");
+        if (!match) throw createError(400, "Password is incorrect");
         await user.hashPassword(newPassword);
         await user.save();
-        res.status(200).json({message: "Change password successfully!"});
+        res.status(200).json({ message: "Change password successfully!" });
     } catch (error) {
         next(error);
     }
@@ -225,7 +225,7 @@ const resetPassword = async (req, res, next) => {
     try {
         const forgotPasswordToken = req.params.token;
         const user = await Users.findOne({ forgotPasswordToken });
-        if(!user) throw createError(404, "Invalid token!");
+        if (!user) throw createError(404, "Invalid token!");
 
         const expired = new Date() > new Date(user.forgotPasswordTokenExpires);
         if (expired) throw createError(400, "Token is expired");
@@ -236,7 +236,7 @@ const resetPassword = async (req, res, next) => {
         await user.hashPassword(newPassword);
         await user.save();
 
-        return res.status(200).json( {message: "Password resets successfully!"})
+        return res.status(200).json({ message: "Password resets successfully!" })
     } catch (error) {
         next(error);
     }
@@ -245,6 +245,7 @@ const resetPassword = async (req, res, next) => {
 const getMe = async (req, res, next) => {
     try {
         const user = req.user;
+
         const { _id: id, email, username, avatar, verified } = user.toObject();
 
         const userData = { id, email, username, avatar, verified };
@@ -298,7 +299,7 @@ const updateProfile = async (req, res, next) => {
         user.username = username;
         user.avatar = avatar;
         await user.save();
-        res.status(200).json({message: "Update profile successfully!"});
+        res.status(200).json({ message: "Update profile successfully!" });
     } catch (error) {
         next(error);
     }
