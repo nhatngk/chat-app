@@ -5,7 +5,7 @@ const crypto = require("crypto");
 
 const friendSchema = new mongoose.Schema({
     details: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
-    chatRoomId: mongoose.Schema.Types.ObjectId,
+    chatRoomId:  { type: mongoose.Schema.Types.ObjectId, ref: "ChatRooms" },
 })
 
 const userSchema = new mongoose.Schema({

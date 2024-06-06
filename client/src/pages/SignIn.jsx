@@ -94,7 +94,7 @@ const SignIn = () => {
           register={register}
           placeholder={"Enter your password"}
         />
-        {isSubmitting ? <LoadingButton /> : (
+        {isSubmitting ? <LoadingButton isSubmitting={isSubmitting} /> : (
           <button type="submit"
             className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
           >Sign in</button>)

@@ -1,6 +1,7 @@
 const createError = require("http-errors");
 const User = require("../models/User");
 const FriendRequest = require("../models/FriendRequest");
+const ChatRoom = require("../models/ChatRoom");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const searchUser = async (req, res, next) => {
@@ -140,24 +141,46 @@ const acceptFriendRequest = async (req, res, next) => {
 
         if (!ObjectId.isValid(requestId)) throw createError(400, "Invalid friend request id");
 
-        const friendRequest = await FriendRequest.findByIdAndUpdate(
-            { _id: requestId, status: "pending" },
+        const friendRequest = await FriendRequest.findOneAndUpdate(
+            { _id: requestId, recipient: userId, status: "pending" },
             { status: "accepted" },
             { new: true });
-        if (!friendRequest)  throw createError(404, "Friend request not found");
+        if (!friendRequest) throw createError(404, "Friend request not found");
+
+        const chatRoom = new ChatRoom({
+            type: "Private",
+            members: [friendRequest.sender, friendRequest.recipient],
+        })
+
         const senderUpdate = User.findByIdAndUpdate(
             friendRequest.sender,
-            { $push: { friends: { details: friendRequest.recipient } } },
+            {
+                $push: {
+                    friends: {
+                        details: friendRequest.recipient,
+                        chatRoom: chatRoom._id
+                    },
+                    chatRooms: chatRoom._id
+                }
+            },
             { new: true, runValidators: true }
         );
 
         const recipientUpdate = User.findByIdAndUpdate(
             friendRequest.recipient,
-            { $push: { friends: { details: friendRequest.sender } } },
+            {
+                $push: {
+                    friends: {
+                        details: friendRequest.sender,
+                        chatRoom: chatRoom._id
+                    },
+                    chatRooms: chatRoom._id
+                }
+            },
             { new: true, runValidators: true }
         );
 
-        await Promise.all([senderUpdate, recipientUpdate]);
+        await Promise.all([chatRoom.save(), senderUpdate, recipientUpdate]);
 
         const user = await User
             .findById(userId)
@@ -168,7 +191,7 @@ const acceptFriendRequest = async (req, res, next) => {
             })
             .exec();
 
-            const receivedRequests = await FriendRequest
+        const receivedRequests = await FriendRequest
             .find({ recipient: userId, status: "pending" })
             .populate("sender", "_id username email avatar")
             .populate("recipient", "_id username email avatar")
@@ -177,6 +200,7 @@ const acceptFriendRequest = async (req, res, next) => {
         res.status(200).json({
             message: "Friend request accepted successfully",
             friends: user.friends,
+            chatRoom,
             receivedRequests
         });
     } catch (error) {
@@ -206,7 +230,7 @@ const rejectFriendRequest = async (req, res, next) => {
 
         res.status(200).json({
             message: "Friend request rejected successfully",
-            receivedRequests    
+            receivedRequests
         });
 
     } catch (error) {
@@ -229,21 +253,21 @@ const unfriend = async (req, res, next) => {
 
         await user.save();
         await friend.save();
-        
+
         const newUser = await User
-        .findById(user._id)
-        .select("friends")
-        .populate({
-            path: "friends.details",
-            select: "_id username email avatar",
-        })
-        .exec();
+            .findById(user._id)
+            .select("friends")
+            .populate({
+                path: "friends.details",
+                select: "_id username email avatar",
+            })
+            .exec();
 
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Unfriended successfully",
             friends: newUser.friends
-         });
+        });
 
     } catch (error) {
         next(error);

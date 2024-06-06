@@ -15,8 +15,8 @@ const VerifyAccount = () => {
   };
 
   return (
-    <div className="flex m-auto  w-1/2 flex-col p-4"> 
-      <h1  className="text-center">Verify Account</h1>
+    <div className="flex m-auto  w-1/2 flex-col p-4">
+      <h1 className="text-center">Verify Account</h1>
 
       <form className="mt-20" onSubmit={handleSubmit(onSubmit)}>
 
@@ -26,9 +26,11 @@ const VerifyAccount = () => {
           <p>We will send you a verification email.</p>
         </div>
 
-        <button type="submit"
-          className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
-        >Verify Account</button>
+        {isSubmitting ? <LoadingButton isSubmitting={isSubmitting} /> : (
+          <button type="submit"
+            className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
+          >Verify Account</button>)
+        }
       </form>
       <p></p>
     </div>

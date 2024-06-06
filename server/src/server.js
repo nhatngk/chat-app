@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
-const jwt = require("jsonwebtoken");
+const socketIO = require("socket.io");
+const http = require("http");
 
 const connectMongo = require("./config/mongodb");
 const { connectRedis } = require("./config/redis");
@@ -25,9 +26,17 @@ const launch = () => {
     app.use(errorHandling);
 
     const PORT = secret.port || 5000;
-    app.listen(PORT, () => {
+
+     const server = http.createServer(app); 
+    const io = socketIO(server); 
+
+    server.listen(PORT, () => {
         console.log("Server is running on", PORT);
-    })
+    });
+
+    io.on('connection', (socket) => {
+      
+    });
 }
 
 (async () => {

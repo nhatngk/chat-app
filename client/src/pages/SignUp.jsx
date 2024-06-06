@@ -2,10 +2,10 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
-import InputField from "~/components/InputField";
 import { useNavigate } from "react-router-dom";
 
 import { signUp } from "~/api/userApi";
+import InputField from "~/components/InputField";
 import LoadingButton from "~/components/LoadingButton";
 import { notifySuccess, notifyError } from "~/utils/toastify";
 
@@ -95,7 +95,7 @@ const SignUp = () => {
           placeholder={"Confirm your password"}
         />
 
-        {isSubmitting ? <LoadingButton /> : (
+        {isSubmitting ? <LoadingButton isSubmitting={isSubmitting} /> : (
           <button type="submit"
             className="mt-4 w-full py-2 rounded-xl bg-blue text-white font-semibold hover:bg-ocean"
           >Sign in</button>)

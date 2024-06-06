@@ -3,7 +3,6 @@ import User from './User';
 
 const Friends = () => {
   const friends = useSelector(state => state.friend.friends);
-  console.log(friends);
   return (
     <div>
       {friends.length === 0
