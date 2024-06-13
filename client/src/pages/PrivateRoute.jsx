@@ -17,9 +17,10 @@ const PrivateRoute = () => {
     const getUser = async () => {
       try {
         const response = await getMe();
+        console.log(response);
         dispatch(setUser(response?.user));
       } catch (error) {
-        notifyError(error.message);
+        notifyError(error);
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -37,7 +38,8 @@ const PrivateRoute = () => {
   return user ? (
     <Outlet />
   ) : (
-    <Navigate to="/sign-in" state={{ from: location }} replace />
+    <></>
+    // <Navigate to="/sign-in" state={{ from: location }} replace />
   );
 }
 

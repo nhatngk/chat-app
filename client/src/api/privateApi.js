@@ -14,10 +14,10 @@ privateApi.interceptors.response.use(
     async error => {
         const originalRequest = error.config;
 
-        if (error?.statusCode === 401 && !originalRequest._retry) {
+        if (error?.response?.data?.statusCode === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             return refreshToken()
-                .then(() => privateApi(originalRequest)) 
+                .then(() =>  privateApi(originalRequest))
                 .catch(error => Promise.reject(error))
         }
 
