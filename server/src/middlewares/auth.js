@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const createError = require("http-errors");
 const ObjectId = require("mongoose").Types.ObjectId;
-const Users = require("../models/User");
+const Users = require("../models/Users");
 const { client } = require("../config/redis");
 const secret = require("../config/env");
 

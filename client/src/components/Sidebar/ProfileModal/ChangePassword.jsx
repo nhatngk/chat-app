@@ -47,6 +47,11 @@ const ChangePassword = () => {
       navigate("/sign-in", { replace: true }, { state: { from: "/" } });
     } catch (error) {
       notifyError(error.message);
+      
+      if(error?.statusCode === 401) {
+        dispatch(setUser(null));
+        navigate("/sign-in", { replace: true }, { state: { from: "/" } });
+      }
     }
   };
 

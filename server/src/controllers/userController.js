@@ -1,5 +1,5 @@
 const createError = require("http-errors");
-const Users = require("../models/User");
+const Users = require("../models/Users");
 const secret = require("../config/env");
 const sendEmail = require("../ultis/mailer");
 const jwt = require("../ultis/jwt");
@@ -274,7 +274,7 @@ const refreshToken = async (req, res, next) => {
                 maxAge: secret.access_token_ttl * 1000
             }
         )
-
+        
         res.cookie(
             "refreshToken",
             refreshToken,

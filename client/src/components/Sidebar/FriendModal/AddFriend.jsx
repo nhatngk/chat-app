@@ -3,6 +3,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSelector } from "react-redux";
+import { setUser } from "~/store/userSlice";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
 
 import User from "./User";
 import { search } from "~/api/friendApi";
@@ -15,7 +19,10 @@ const AddFriend = () => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   const { friends, sentRequests, receivedRequests } = useSelector((state) => state.friend);
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+ 
   const { register, handleSubmit } = useForm({
     mode: "onBlur",
     resolver: yupResolver(schema),
@@ -31,6 +38,10 @@ const AddFriend = () => {
         setUsers(response.users)
       }
     } catch (error) {
+      if(error?.statusCode === 401) {
+        dispatch(setUser(null));
+        navigate("/sign-in", { replace: true }, { state: { from: location } });
+      }
       setError(error.message);
     }
   }

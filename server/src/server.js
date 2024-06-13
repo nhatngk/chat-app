@@ -1,12 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
-const socketIO = require("socket.io");
+const { Server } = require("socket.io");
 const http = require("http");
 
 const connectMongo = require("./config/mongodb");
 const { connectRedis } = require("./config/redis");
 const route = require("./routes/index");
+const { onlineController, disconnected } = require("./socket/connectionSocket");
+const { addRequest, acceptRequest, deleteRequest, unfriend } = require("./socket/friendSocket");
+const { sendMessage } = require("./socket/messageSocket");
 const errorHandling = require("./middlewares/errorHandling");
 const secret = require("./config/env");
 
@@ -27,15 +30,27 @@ const launch = () => {
 
     const PORT = secret.port || 5000;
 
-     const server = http.createServer(app); 
-    const io = socketIO(server); 
+    const server = http.createServer(app);
+
+    const io = new Server(server, {
+        cors: {
+            origin: secret.client_url,
+            methods: ["GET", "POST"],
+        }
+    });
 
     server.listen(PORT, () => {
         console.log("Server is running on", PORT);
     });
 
     io.on('connection', (socket) => {
-      
+        onlineController(io, socket);
+        sendMessage(io, socket);
+        addRequest(io, socket);
+        deleteRequest(io, socket);
+        acceptRequest(io, socket);
+        unfriend(io, socket);
+        disconnected(io, socket);
     });
 }
 

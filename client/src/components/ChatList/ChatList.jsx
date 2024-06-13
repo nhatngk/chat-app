@@ -4,30 +4,18 @@ import Search from "./Search";
 import Contact from "./Contact";
 
 const ChatList = () => {
+  const chatList = useSelector((state) => state.chat.chatRooms);
 
   return (
-    <div className="flex flex-col min-w-96 p-4 pb-0 border-r-[1px] border-solid border-blur">
+    <div className="flex flex-col  p-4 pb-0 border-r-[1px] border-solid border-blur">
       <h1>Chats</h1>
       <Search />
       <div className="mt-4 overflow-y-auto flex-1 pr-1">
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
-        <Contact />
+        {
+          chatList.length === 0
+            ? (<p className="text-center">Please add friend to start chat </p>)
+            : chatList.map((chat, index) => <Contact key={index} chat={chat} />)
+        }
       </div>
     </div>
   )

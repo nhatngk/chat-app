@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
+import useSocket from "~/hooks/useSocket";
 import Avatar from "../Avatar";
 import Logout from "~/assets/svg/Logout";
 import Friends from "~/assets/svg/Friends";
@@ -9,6 +10,7 @@ import { setUser } from "~/store/userSlice";
 
 const SideBar = (props) => {
   const { setShowProfileModal, setShowFriendModal } = props;
+  const { socket } = useSocket();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -25,12 +27,15 @@ const SideBar = (props) => {
       dispatch(setUser(null));
       navigate("/sign-in", { replace: true });
     } catch (error) {
-      console.log(error);
+      if(error?.statusCode === 401) {
+        dispatch(setUser(null));
+        navigate("/sign-in", { replace: true } );
+      }
     }
   }
 
   return (
-    <div className="w-24 flex flex-col justify-between border-r-[1px] border-solid border-blur">
+    <div className="w-16 flex flex-col justify-between border-r-[1px] border-solid border-blur">
 
       <div className="flex flex-col items-center justify-center">
         <button

@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from 'react'
-
-import { friendsAndRequests } from '~/api/friendApi';
+import { useState, useRef, useEffect } from 'react'
 import { useDispatch } from 'react-redux';
-import { setFriends, setReceivedRequests, setSentRequests } from '~/store/friendSlice';
-import Loading from '~/components/Loading';
+import useSocket from '~/hooks/useSocket';
+import useFriends from '~/hooks/useFriends';
+import { friendActions } from '~/store/friendSlice';
+import { chatActions } from '~/store/chatSlice';
 import Friends from './Friends';
 import AddFriend from './AddFriend';
 import ReceivedRequest from './ReceivedRequest';
@@ -12,8 +12,8 @@ import CloseButton from '~/assets/svg/CloseButton';
 
 const FriendModal = (props) => {
   const { setShowFriendModal } = props;
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { socketListen, userId, socket } = useSocket();
+  const { loading, error } = useFriends();
   const dispatch = useDispatch();
 
   const modal = useRef(null);
@@ -45,22 +45,55 @@ const FriendModal = (props) => {
   }
 
   useEffect(() => {
-    let isMounted = true;
-    const getFriendRequests = async () => {
-      try {
-        const response = await friendsAndRequests();
-        dispatch(setFriends(response));
-        dispatch(setSentRequests(response));
-        dispatch(setReceivedRequests(response));
-      } catch (error) {
-        setError(true);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    }
-    getFriendRequests();
+    socketListen("sentRequest", (newRequest) => {
+      dispatch(friendActions.addSentRequest(newRequest));
+    })
 
-    return () => { isMounted = false }
+    socketListen("receivedRequest", (newRequest) => {
+      dispatch(friendActions.addReceivedRequest(newRequest));
+    })
+
+    socketListen("deleteSent", (requestId) => {
+      dispatch(friendActions.removeSentRequest(requestId));
+    })
+
+    socketListen("deleteReceived", (requestId) => {
+      dispatch(friendActions.removeReceivedRequest(requestId));
+    })
+
+    socketListen("acceptSent", (chatRoom, requestId) => {
+      const newFriend = chatRoom.members.find(member => member._id.toString() !== userId.toString());
+      dispatch(friendActions.addFriend({
+        details: newFriend,
+        chatRoomId: chatRoom._id
+      }));
+      dispatch(chatActions.addChatRoom(chatRoom));
+      dispatch(friendActions.removeSentRequest(requestId));
+    })
+
+    socketListen("acceptReceived", (chatRoom, requestId) => {
+      const newFriend = chatRoom.members.find(member => member._id.toString() !== userId.toString());
+      dispatch(friendActions.addFriend({
+        details: newFriend,
+        chatRoomId: chatRoom._id
+      }));
+      dispatch(chatActions.addChatRoom(chatRoom));
+      dispatch(friendActions.removeReceivedRequest(requestId));
+    })
+
+    socketListen("unfriend", (friendId) => {
+      dispatch(friendActions.removeFriend(friendId));
+    })
+
+    return () => {
+      socket.off("sentRequest");
+      socket.off("receivedRequest");
+      socket.off("deleteSent");
+      socket.off("deleteReceived");
+      socket.off("acceptSent");
+      socket.off("acceptReceived");
+      socket.off("unfriend");
+    }
   }, []);
 
   return (
@@ -84,11 +117,7 @@ const FriendModal = (props) => {
             </div>
 
             <div className='w-full relative'>
-              {isLoading ? <Loading /> : (
-                error ? (
-                  <div>
-                    <p className="text-center my-2 text-red">An error occurred. Please try again!</p>
-                  </div>) : activeSection.content)}
+              {activeSection.content}
             </div>
 
           </div>

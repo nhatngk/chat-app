@@ -24,7 +24,6 @@ const PrivateRoute = () => {
         if (isMounted) setIsLoading(false);
       }
     }
-
     if (!user) {
       getUser();
     } else {
