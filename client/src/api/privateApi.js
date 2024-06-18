@@ -18,6 +18,7 @@ privateApi.interceptors.response.use(
             originalRequest._retry = true;
             return refreshToken()
                 .then(() =>  privateApi(originalRequest))
+                .then(() =>  privateApi(originalRequest))
                 .catch(error => Promise.reject(error))
         }
 
