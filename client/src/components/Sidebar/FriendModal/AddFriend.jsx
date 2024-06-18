@@ -74,6 +74,7 @@ const AddFriend = () => {
               }
               return (
                 <User
+                  key={user._id}
                   id={user._id}
                   avatar={user.avatar}
                   email = {user.email}

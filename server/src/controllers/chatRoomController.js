@@ -1,14 +1,81 @@
 const createError = require("http-errors");
-const ChatRoom = require("../models/ChatRooms");
 const ObjectId = require("mongoose").Types.ObjectId;
+const ChatRoom = require("../models/ChatRooms");
+const Message = require("../models/Messages");
+const User = require("../models/Users");
 
-exports.getAllChatRoom = async (req, res, next) => {
+exports.setNameChatRoom = (chatRoom, userId) => {
+    if (chatRoom.roomType === 'private')
+        chatRoom.name = chatRoom.members.find(member => member._id.toString() !== userId.toString()).username;
+    return chatRoom;
+}
+
+exports.getSocketDetails = async (userId) => {
+    if (!ObjectId.isValid(userId)) throw new Error("Invalid userId");
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+    const allRooms = user?.chatRooms.map((room) => room.toString());
+    return {
+        user,
+        allRooms
+    };
+};
+
+exports.getAllMessages = async (req, res, next) => {
     try {
-       
-        const chatRooms = await ChatRoom
+        const chatRoomId = req.params.id;
+        if (!ObjectId.isValid(chatRoomId)) throw createError(400, "Invalid chat room id");
+
+        const chatRoom = await ChatRoom.findById(chatRoomId)
+            .populate({
+                path: "messageHistory",
+                populate: {
+                    path: "sender"
+                }
+            })
+            .exec();
+        if (!chatRoom) throw createError(404, "Chat room not found");
+        return res.status(200).json({
+            messages: chatRoom.messageHistory
+        });
+
     } catch (error) {
-        next(error);
+        next(error)
     }
+}
+
+exports.getAllChatRooms = async (chatRooms, userId) => {
+    if (!chatRooms.length) return [];
+
+    const chatRoomsDetailsPromises = chatRooms.map(async (chatRoom) => {
+        let chatRoomDetails = await ChatRoom.findById(chatRoom)
+            .populate("members", "_id username email avatar status")
+            .exec();
+        chatRoomDetails = chatRoomDetails.toObject();
+        chatRoomDetails = this.setNameChatRoom(chatRoomDetails, userId);
+
+        const latestMessageId = chatRoomDetails.messageHistory.length && chatRoomDetails.messageHistory[chatRoomDetails.messageHistory.length - 1];
+        if (latestMessageId) {
+            chatRoomDetails.latestMessage = await Message.findById(latestMessageId)
+                .populate("sender", "_id username email avatar status")
+                .exec();
+        }
+        const { messageHistory, ...rest } = chatRoomDetails;
+        return rest;
+    })
+
+    const chatRoomsDetails = await Promise.all(chatRoomsDetailsPromises);
+
+    chatRoomsDetails.sort((a, b) => {
+        if (!a.latestMessage && !b.latestMessage) {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        if (!a.latestMessage) return 1;
+        if (!b.latestMessage) return -1;
+        return new Date(b.latestMessage.timeSent) - new Date(a.latestMessage.timeSent);
+    });
+
+    return chatRoomsDetails;
 }
 
 exports.createPrivateChat = async (req, res, next) => {
@@ -64,9 +131,4 @@ exports.createGroupChat = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}
-
-exports.setNameChatRoom = (chatRoom, userId) => {
-    chatRoom.name = chatRoom.members.find(member => member._id.toString() !== userId.toString()).username;
-    return chatRoom;
 }

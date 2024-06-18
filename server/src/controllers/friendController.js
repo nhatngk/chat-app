@@ -2,6 +2,7 @@ const createError = require("http-errors");
 const User = require("../models/Users");
 const FriendRequest = require("../models/FriendRequests");
 const ChatRoom = require("../models/ChatRooms");
+const { getAllChatRooms } = require("../controllers/chatRoomController");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 exports.searchUser = async (req, res, next) => {
@@ -92,7 +93,7 @@ exports.createRequest = async (userId, recipientId) => {
         .populate("sender", "_id username email avatar")
         .populate("recipient", "_id username email avatar")
         .exec();
-    
+
     return newRequest;
 }
 
@@ -127,24 +128,31 @@ exports.acceptRequest = async (requestId) => {
     await User.findByIdAndUpdate(
         request.sender,
         {
-            $push: { friends: { details: request.recipient, chatRoomId: newChatRoom._id } }
+            $push: {
+                friends: { details: request.recipient, chatRoomId: newChatRoom._id },
+                chatRooms: newChatRoom._id
+            }
         });
     await User.findByIdAndUpdate(
         request.recipient,
-        { $push: { friends: { details: request.sender, chatRoomId: newChatRoom._id } } }
+        {
+            $push: {
+                friends: { details: request.sender, chatRoomId: newChatRoom._id },
+                chatRooms: newChatRoom._id
+            }
+        }
     )
-    const chatRoomDetails = await ChatRoom.findById(newChatRoom._id)
-        .populate("members", "_id username email avatar")
-        .exec();
+
+    const chatRoomDetails = await getAllChatRooms([newChatRoom._id], request.recipient);
     return {
         request,
-        chatRoom: chatRoomDetails
+        chatRoom: chatRoomDetails[0]
     }
 }
 
 exports.unfriend = async (userId, friendId) => {
-    if (!ObjectId.isValid(userId)) throw new Error(400, "Invalid friend id"); 
-    if (!ObjectId.isValid(friendId)) throw new Error(400, "Invalid friend id"); 
+    if (!ObjectId.isValid(userId)) throw new Error(400, "Invalid friend id");
+    if (!ObjectId.isValid(friendId)) throw new Error(400, "Invalid friend id");
 
     const user = await User.findById(userId);
     const friend = await User.findById(friendId);

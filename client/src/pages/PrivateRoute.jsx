@@ -7,7 +7,7 @@ import { notifyError } from "~/utils/toastify";
 import Loading from "~/components/Loading";
 
 const PrivateRoute = () => {
-  const user = useSelector(state => state.user.currentUser);
+  const userId = useSelector(state => state.user.currentUser?.id);
   const dispatch = useDispatch();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
@@ -17,7 +17,6 @@ const PrivateRoute = () => {
     const getUser = async () => {
       try {
         const response = await getMe();
-        console.log(response);
         dispatch(setUser(response?.user));
       } catch (error) {
         notifyError(error);
@@ -25,7 +24,7 @@ const PrivateRoute = () => {
         if (isMounted) setIsLoading(false);
       }
     }
-    if (!user) {
+    if (!userId) {
       getUser();
     } else {
       setIsLoading(false);
@@ -35,7 +34,7 @@ const PrivateRoute = () => {
 
   if (isLoading) return <Loading />;
 
-  return user ? (
+  return userId ? (
     <Outlet />
   ) : (
     <></>

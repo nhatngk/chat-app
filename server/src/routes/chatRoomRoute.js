@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const auth = require("../middlewares/auth");
-const { createGroupChat } = require("../controllers/chatRoomController");
+const { createGroupChat, getAllMessages } = require("../controllers/chatRoomController");
 const validate = require("../middlewares/validate");
+const { body } = require("express-validator");
 
+router.get("/:id", auth.verifyAccessToken, getAllMessages);
 
 router.post("/create/group",
     body("nameGroup")

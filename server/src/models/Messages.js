@@ -11,7 +11,7 @@ const callDetailsSchema = new mongoose.Schema({
 const MessageSchema = new mongoose.Schema({
     messageType: {
         type: String,
-        enum: ["text", "image", "call", "voice", "document", "notification", "like"],
+        enum: ["text", "image", "video", "call", "voice", "document", "notification", "like"],
     },
     sender: mongoose.Schema.Types.ObjectId,
     readStatus: {
@@ -27,6 +27,7 @@ const MessageSchema = new mongoose.Schema({
     timeSent: Date,
     message: String,
     imageUrl: String,
+    videoUrl: String,
     voiceNoteUrl: String,
     voiceNoteDuration: String,
     callDetails: callDetailsSchema,

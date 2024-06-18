@@ -1,13 +1,13 @@
 const { addMessage, addUndeliveredMessage, handleUndeliveredMembers } = require("../controllers/messageController");
 
 exports.sendMessage = async (io, socket) => {
-    socket.on("message", async (message, chatRoomId) => {
+    socket.on("sendMessage", async (message, chatRoomId) => {        
         const newMessage = await addMessage(message, chatRoomId);
-        io.timeout(180000)
+        io.timeout(10000)
             .to(chatRoomId)
             .emit("message", {
-                message: newMessage,
                 chatRoomId,
+                message: newMessage,
             }, async (error, membersId) => {
                 if (error) {
                     console.log(error);

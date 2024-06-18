@@ -46,14 +46,14 @@ const userSchema = new mongoose.Schema({
     undeliveredMessages: [{}],
     friends: [friendSchema],
     //expired if not verified within 7 days
-    expireAt: {
-        type: Date,
-        default: Date.now,
-        index: {
-            expireAfterSeconds: 7 * 86400,
-            partialFilterExpression: { verified: false }
-        }
-    }
+    // expireAt: {
+    //     type: Date,
+    //     default: Date.now,
+    //     index: {
+    //         expireAfterSeconds: 7 * 86400,
+    //         partialFilterExpression: { verified: false }
+    //     }
+    // }
 }, {
     timestamps: true
 })

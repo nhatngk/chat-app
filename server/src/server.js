@@ -7,7 +7,7 @@ const http = require("http");
 const connectMongo = require("./config/mongodb");
 const { connectRedis } = require("./config/redis");
 const route = require("./routes/index");
-const { onlineController, disconnected } = require("./socket/connectionSocket");
+const { onlineController, disconnecting } = require("./socket/connectionSocket");
 const { addRequest, acceptRequest, deleteRequest, unfriend } = require("./socket/friendSocket");
 const { sendMessage } = require("./socket/messageSocket");
 const errorHandling = require("./middlewares/errorHandling");
@@ -50,7 +50,7 @@ const launch = () => {
         deleteRequest(io, socket);
         acceptRequest(io, socket);
         unfriend(io, socket);
-        disconnected(io, socket);
+        disconnecting(io, socket);
     });
 }
 

@@ -2,16 +2,17 @@ const ChatRoom = require("../models/ChatRooms");
 const Message = require("../models/Messages");
 const User = require("../models/Users");
 exports.addMessage = async (message, chatRoomId) => {
-    const newMessage = new Message(message);
+    const newMessage = new Message({
+        ...message,
+        timeSent: new Date(),
+    });
     const chatRoom = await ChatRoom.findById(chatRoomId);
     newMessage.undeliveredMembers = chatRoom.members.filter(
         member => member.toString() !== newMessage.sender.toString()
     );
     newMessage.unreadMembers = newMessage.undeliveredMembers;
     chatRoom.messageHistory.push(newMessage._id);
-    await newMessage.save();
-    await chatRoom.save();
-
+    await Promise.all([newMessage.save(), chatRoom.save()]);
     for (let member of newMessage.unreadMembers) {
         await User.findByIdAndUpdate(member, {
             $push: {
@@ -29,7 +30,7 @@ module.exports.addUndeliveredMessage = async ({ undeliveredMembers, messageId, c
     for (let member of undeliveredMembers) {
         await User.findByIdAndUpdate(member, {
             $push: {
-                "unreadMessages": {
+                "undeliveredMessages": {
                     chatRoomId,
                     messageId
                 }

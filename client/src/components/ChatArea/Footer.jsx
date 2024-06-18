@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import EmojiPicker from "emoji-picker-react";
 import SendMessage from "~/assets/svg/SendMessage";
 import Like from "~/assets/svg/Like";
@@ -6,11 +7,14 @@ import EmojiPickerButton from "~/assets/svg/EmojiPickerButton";
 import Attach from "~/assets/svg/Attach";
 import Voice from "~/assets/svg/Voice";
 import HoverInfo from "../HoverInfo";
+import useSocket from "~/hooks/useSocket";
 
 const Footer = () => {
     const [isMultiLine, setIsMultiLine] = useState(false);
     const [open, setOpen] = useState(false);
-    const [data, setData] = useState({text: ""});
+    const [data, setData] = useState(null);
+    const { socketEmit, userId } = useSocket();
+    const chatRoomId = useSelector((state) => state.chat.currentChatRoom);
 
     const handleOnChange = (e) => {
         setData((prev) => ({ ...prev, text: e.target.value }));
@@ -20,13 +24,31 @@ const Footer = () => {
         e.target.style.height = e.target.scrollHeight + 'px';
     }
 
-    const handleOnClick = () => {
+    const handleToggleEmojiPicker = () => {
         setOpen(!open);
     }
 
-    const handleEmojiClick = (emoji) => {
-        setData((prev) => ({ ...prev, text: prev.text + emoji.emoji }));
-        setOpen(false);
+    const handlePickEmoji = (emoji) => {
+        setData((prev) => ({ ...prev, text: (prev?.text ?? "" ) + emoji.emoji }));
+    }
+
+    const handleOnKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleOnSubmit(e);
+        }
+    }
+
+    const handleOnSubmit = (e) => {
+        e.preventDefault();
+        if (!data) return;
+        socketEmit("sendMessage", {
+            sender: userId,
+            messageType: "text",
+            message: data?.text,
+        },
+            chatRoomId
+        );
+        setData(null);
     }
 
     return (
@@ -47,17 +69,21 @@ const Footer = () => {
                 </div>
             </div>
 
-            <div className="w-full flex flex-row relative mx-2 bg-[#f0f2f5] rounded-3xl p-2">
+            <form
+                onSubmit={handleOnSubmit}
+                className="w-full flex flex-row relative mx-2 bg-[#f0f2f5] rounded-3xl p-2"
+            >
                 <textarea
                     onChange={handleOnChange}
-                    value={data?.text}
+                    onKeyDown={handleOnKeyDown}
+                    value={data?.text || ""}
                     rows="1" cols="50"
                     placeholder="Aa"
                     className={`max-h-36 resize-none w-full mx-3 mr-6 pr-2 outline-none bg-[#f0f2f5] overflow-auto "}`}
                 />
 
                 <div className={`absolute right-0 translate-y-[50%] ${isMultiLine ? "bottom-5" : "bottom-[50%] "} `}>
-                    <div onClick={handleOnClick} className="relative hover-circle size-8  flex items-center justify-center hover:bg-[#c2bbbb]" >
+                    <div onClick={handleToggleEmojiPicker} className="relative hover-circle size-8  flex items-center justify-center hover:bg-[#c2bbbb]" >
                         <div className="parent">
                             <EmojiPickerButton />
                             <HoverInfo text="Pick emoji" direction="top" />
@@ -65,7 +91,7 @@ const Footer = () => {
                         <div className="absolute top-[-320px] right-[0px]">
                             <EmojiPicker
                                 open={open}
-                                onEmojiClick={handleEmojiClick}
+                                onEmojiClick={handlePickEmoji}
                                 width={300}
                                 height={300}
                                 rows={5}
@@ -79,12 +105,14 @@ const Footer = () => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
 
             <div className="">
                 {
                     data?.text ? (
-                        <div className={`${isMultiLine ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}>
+                        <div onClick={handleOnSubmit}
+                            className={`${isMultiLine ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}
+                        >
                             <div className="parent">
                                 <SendMessage />
                                 <HoverInfo text="Press to send" direction="top-left" />

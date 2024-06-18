@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { signOut } from "~/api/userApi";
 
 const friendSlice = createSlice({
     name: "friend",
@@ -33,9 +34,14 @@ const friendSlice = createSlice({
             state.sentRequests.push(action.payload);
         },
         removeSentRequest: (state, action) => {
-            state.sentRequests = state.sentRequests.filter((request) => request._id.toString() !== action.payload.toString() );
-    },
-    }       
+            state.sentRequests = state.sentRequests.filter((request) => request._id.toString() !== action.payload.toString());
+        },
+        signOut: (state) => {
+            state.friends = [];
+            state.receivedRequests = [];
+            state.sentRequests = [];
+        }
+    }
 });
 
 export const friendActions = friendSlice.actions;

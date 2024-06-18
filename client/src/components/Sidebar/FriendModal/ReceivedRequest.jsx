@@ -7,6 +7,7 @@ const ReceivedRequest = () => {
     <div className="p-3 flex flex-col overflow-y-auto">
       {receivedRequests.map((request) => (
         <User
+          key={request.sender._id}
           id={request.sender._id}
           avatar={request.sender.avatar}
           username={request.sender.username}

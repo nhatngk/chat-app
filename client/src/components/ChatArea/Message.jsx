@@ -6,14 +6,14 @@ const Message = ({ message, direction, order }) => {
     switch (message.messageType) {
       case 'text':
         return (
-          <p className={` bg-[#f5f5f5] px-2 py-[6px] 
+          <p className={`bg-[#f5f5f5] px-2 py-[6px] max-w-[25rem] break-words
           ${direction === 'send' ? 'send' : 'receive'}
           ${order === 'single' ? 'order-single' : ''}
           ${order === 'first' ? 'order-first' : ''}
           ${order === 'middle' ? 'order-middle' : ''}
           ${order === 'last' ? 'order-last' : ''}  
           `}
-          >{message?.text}</p>
+          >{message?.message}</p>
         );
 
       case 'image':

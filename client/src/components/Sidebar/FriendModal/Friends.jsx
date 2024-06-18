@@ -11,6 +11,7 @@ const Friends = () => {
         ) : (
           friends.map((friend) => (
             <User
+              key={friend.details._id}
               id={friend.details._id}
               avatar={friend.details.avatar}
               username={friend.details.username}

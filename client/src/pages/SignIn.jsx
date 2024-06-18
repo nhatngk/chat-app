@@ -10,7 +10,6 @@ import { setUser } from "~/store/userSlice";
 import { signIn, getMe } from "~/api/userApi";
 import InputField from "~/components/InputField";
 import LoadingButton from "~/components/LoadingButton";
-import Loading from "~/components/Loading";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required!"),
@@ -53,7 +52,6 @@ const SignIn = () => {
         const response = await getMe();
         dispatch(setUser(response?.user));
       } catch (error) {
-        console.log(error);
       } finally {
         if (isMounted) setIsLoading(false);
       }

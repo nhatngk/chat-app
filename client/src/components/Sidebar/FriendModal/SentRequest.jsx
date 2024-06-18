@@ -7,6 +7,7 @@ const SentRequest = () => {
     <div className="p-3 flex flex-col overflow-y-auto">
       {sentRequests.map((request) => (
         <User
+          key={request.recipient._id}
           id={request.recipient._id}
           avatar={request.recipient.avatar}
           email={request.recipient.email}

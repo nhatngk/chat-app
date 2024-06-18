@@ -1,29 +1,19 @@
-const User = require("../models/Users");
 const { handleUndeliveredMembers } = require("../controllers/messageController");
-
-exports.getSocketDetails = async (userId) => {
-  if(!userId) throw new Error("Invalid userId");
-  const user = await User.findById(userId);
-  if (!user) throw new Error("User not found");
-  allRooms = user?.chatRooms.map((room) => room.toString());
-  return {
-    user,
-    allRooms
-  };
-};
+const { getSocketDetails, getAllChatRooms } = require("../controllers/chatRoomController");
 
 exports.onlineController = (io, socket) => {
   socket.on("online", async (userId) => {
     try {
       socket.userId = userId;
+      const { user, allRooms } = await getSocketDetails(userId);
       socket.join(userId.toString());
-      const { user, allRooms } = await this.getSocketDetails(userId);
       socket.join(allRooms);
+
       user.status = {
         online: true,
         lastSeen: undefined,
       };
-  
+      
       for (let message of user.undeliveredMessages) {
         await handleUndeliveredMembers({
           io,
@@ -31,26 +21,34 @@ exports.onlineController = (io, socket) => {
           ...message
         });
       }
-  
       user.undeliveredMessages = [];
       await user.save();
+
+      const chatRooms = await getAllChatRooms(allRooms, userId);
       socket.to(allRooms).emit("online", userId);
+      socket.emit("chatRooms", chatRooms);
     } catch (error) {
-      console.log(error);
+      socket.emit("error", {
+        message: error.message,
+      });
     }
   })
 }
 
-exports.disconnected = async(io, socket) => {
+exports.disconnecting = async (io, socket) => {
   socket.on("disconnecting", async () => {
-    const userId = socket.userId;
-    const { user, allRooms } = await this.getSocketDetails(userId);
-    const time = new Date(Date.now()).toISOString();
-    user.status = {
-      online: false,
-      lastSeen: time
-    };
-    await user.save(); 
-    socket.to(allRooms).emit("offline", userId);
+    try {
+      const userId = socket.userId;
+      const { user, allRooms } = await getSocketDetails(userId);
+      const time = new Date(Date.now());
+      user.status = {
+        online: false,
+        lastSeen: time
+      };
+      await user.save();
+      socket.to(allRooms).emit("offline", userId, time);
+      socket.leave(allRooms);
+    } catch (error) {
+    }
   })
 } 

@@ -5,7 +5,6 @@ import Button from './Button';
 const User = ({ id, email, username, requestId, avatar, type }) => {
   const { socketEmit, userId } = useSocket();
   const handleUnfriend = async () => {
-    console.log(userId, id);
    socketEmit("unfriend", userId, id);
   }
 
@@ -14,7 +13,6 @@ const User = ({ id, email, username, requestId, avatar, type }) => {
   }
 
   const handleAccept = async () => {
-    console.log(requestId);
     socketEmit("acceptRequest", requestId);
   }
 
@@ -46,7 +44,7 @@ const User = ({ id, email, username, requestId, avatar, type }) => {
     }
   }
   return (
-    <div key={id} className='flex justify-between p-2'>
+    <div className='flex justify-between p-2'>
       <div className='flex items-center gap-2'>
         <Avatar srcImg={avatar} size={10} />
         <div>
