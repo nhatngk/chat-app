@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import EmojiPicker from "emoji-picker-react";
 import SendMessage from "~/assets/svg/SendMessage";
@@ -11,6 +11,7 @@ import useSocket from "~/hooks/useSocket";
 
 const Footer = () => {
     const [isMultiLine, setIsMultiLine] = useState(false);
+    const textareaRef = useRef(null);
     const [open, setOpen] = useState(false);
     const [data, setData] = useState(null);
     const { socketEmit, userId } = useSocket();
@@ -20,8 +21,8 @@ const Footer = () => {
         setData((prev) => ({ ...prev, text: e.target.value }));
         e.target.style.height = 'auto';
         const newHeight = e.target.scrollHeight;
-        setIsMultiLine(newHeight > 30);
         e.target.style.height = e.target.scrollHeight + 'px';
+        setIsMultiLine(newHeight > 30);
     }
 
     const handleToggleEmojiPicker = () => {
@@ -38,6 +39,16 @@ const Footer = () => {
         }
     }
 
+    const handleOnClickLike = (e) => {
+        e.preventDefault();
+        socketEmit("sendMessage", {
+            sender: userId,
+            messageType: "like",
+        },
+            chatRoomId
+        );
+    }
+
     const handleOnSubmit = (e) => {
         e.preventDefault();
         if (!data) return;
@@ -49,7 +60,15 @@ const Footer = () => {
             chatRoomId
         );
         setData(null);
+        setIsMultiLine(false);
+        textareaRef.current.style.height = 'auto';
     }
+
+    useEffect(() => {
+        setData(null);
+        setIsMultiLine(false);
+        textareaRef.current.style.height = 'auto';
+    },[chatRoomId])
 
     return (
         <div className={`flex flex-row px-3 pb-[10px] pt-1 w-full bottom-0 ${isMultiLine ? "items-end" : "items-center"}`}>
@@ -74,6 +93,7 @@ const Footer = () => {
                 className="w-full flex flex-row relative mx-2 bg-[#f0f2f5] rounded-3xl p-2"
             >
                 <textarea
+                    ref={textareaRef}
                     onChange={handleOnChange}
                     onKeyDown={handleOnKeyDown}
                     value={data?.text || ""}
@@ -120,7 +140,7 @@ const Footer = () => {
 
                         </div>
                     ) : (
-                        <div className="hover-circle size-9 flex items-center justify-center ">
+                        <div className="hover-circle size-9 flex items-center justify-center" onClick={handleOnClickLike}>
                             <div className="parent ">
                                 <Like />
                                 <HoverInfo text="Send like" direction="top-left" />

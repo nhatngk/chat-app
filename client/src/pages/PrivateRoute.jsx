@@ -17,7 +17,6 @@ const PrivateRoute = () => {
     const getUser = async () => {
       try {
         const response = await getMe();
-        console.log(response);
         dispatch(setUser(response?.user));
       } catch (error) {
         notifyError(error);

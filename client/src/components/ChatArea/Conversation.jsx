@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux"
 import Message from "./Message"
 import Loading from "../Loading";
@@ -6,12 +6,21 @@ import { getAllMessages } from "~/api/chatApi";
 import { chatActions } from "~/store/chatSlice";
 
 const Conversation = () => {
-  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const endOfConversation = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
   const userId = useSelector((state) => state.user.currentUser?.id);
   const currentChatRoom = useSelector((state) => state.chat.currentChatRoom);
   const conversation = useSelector((state) => state.chat.conversations).find(conversation => conversation.chatRoomId === currentChatRoom);
-  const messages = conversation?.messages || [];
+
+  useEffect(() => {
+    setMessages(conversation?.messages)
+  }, [conversation])
+
+  useEffect(() => {
+    endOfConversation.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   useEffect(() => {
     let isMounted = true;
@@ -31,7 +40,7 @@ const Conversation = () => {
     }
 
     return () => {
-      isMounted = false
+      isMounted = false 
     }
   }, [currentChatRoom])
 
@@ -42,7 +51,7 @@ const Conversation = () => {
   )
 
   return (
-    <div className='flex flex-1 w-full flex-col py-2 px-4 gap-[2px] overflow-y-auto '>
+    <div className='flex flex-1 w-full flex-col py-2 px-4 gap-[2px] overflow-y-auto'>
       {
         !!messages.length && messages.map((message, index) => {
           let order = null;
@@ -70,7 +79,8 @@ const Conversation = () => {
             </div>)
         })
       }
-
+      
+      <div ref={endOfConversation} />
     </div>
   )
 }

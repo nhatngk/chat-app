@@ -1,5 +1,7 @@
 import Avatar from '../Avatar';
 import HoverInfo from '../HoverInfo';
+import Like from '../../assets/svg/Like';
+import { formatTime } from '~/utils/handleTime';
 
 const Message = ({ message, direction, order }) => {
   const renderContent = () => {
@@ -18,8 +20,13 @@ const Message = ({ message, direction, order }) => {
 
       case 'image':
         return (
-          <img src={`${message?.imageUrl}`} alt=""  className='max-w-xs max-h-xs h-auto w-auto rounded-xl'/>
+          <img src={`${message?.imageUrl}`} alt="" className='max-w-xs max-h-xs h-auto w-auto rounded-xl' />
         );
+
+      case 'like':
+        return (
+          <Like size={10}/>
+        )
     }
   }
 
@@ -31,7 +38,7 @@ const Message = ({ message, direction, order }) => {
 
       <div className='parent'>
         {renderContent()}
-        <HoverInfo text={message?.timeSent} direction={`${direction === 'send' ? 'left' : 'right'}`} />
+        <HoverInfo text={formatTime(message?.timeSent)} direction={`${direction === 'send' ? 'left' : 'right'}`} />
       </div>
     </div>)
 }

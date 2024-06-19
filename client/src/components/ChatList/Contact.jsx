@@ -1,21 +1,28 @@
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Avatar from "../Avatar";
-
-const truncateString = (inputStr) => {
-  if (inputStr.length > 25) {
-    return inputStr.slice(0, 25) + "...";
-  } else {
-    return inputStr;
-  }
-}
+import { useState } from "react";
+import { useEffect } from "react";
+import { formatTimeAgo } from "~/utils/handleTime";
 
 const Contact = ({ chat }) => {
+  const [timeAgo, setTimeAgo] = useState();
   const userId = useSelector((state) => state.user.currentUser?.id);
   const friend = chat.roomType === "private" && chat.members.find(member => member._id.toString() !== userId.toString());
   const latestMessage = chat?.latestMessage;
   const unread = chat?.unreadMembers?.includes(userId);
   const currentChatRoom = useSelector((state) => state.chat.currentChatRoom);
+
+  useEffect(() => { 
+    if (latestMessage) {
+      setTimeAgo(formatTimeAgo(latestMessage.timeSent));
+    }
+    const interval = setInterval(() => {
+      setTimeAgo(formatTimeAgo(latestMessage.timeSent));
+    },60 * 1000)
+    return () => clearInterval(interval);
+  }, [latestMessage])
+
   const render = (latestMessage) => {
     const sender = latestMessage?.sender?.username;
     const type = latestMessage?.messageType;
@@ -31,6 +38,8 @@ const Contact = ({ chat }) => {
       return `$${sender === userId ? "You" : sender} sent a voice note.`
     } else if (type === "document") {
       return `$${sender === userId ? "You" : sender} sent a file.`
+    } else if (type === "like") {
+      return
     } else if (type === "call") {
       return ""
     }
@@ -66,14 +75,14 @@ const Contact = ({ chat }) => {
       )
       }
 
-      <div className="pl-[10px] flex flex-col ">
-        <span className="text-md font-semibold">{truncateString(chat.name)}</span>
-        <div className="text-xs">
-          <span className={` ${unread ? "text-[#050505] font-bold" : "text-[#65676B]"}`}>
-            {truncateString(render(latestMessage))}
-          </span>
-          {latestMessage && <span> · </span>}
-          <span className={` text-[#65676B]`}>{latestMessage?.timeSent}</span>
+      <div className="pl-[10px] flex flex-col max-w-[calc(100%-4rem) ">
+        <p className="text-md font-semibold truncate">{chat.name}</p>
+        <div className="text-xs flex">
+          <p className={`truncate max-w-[70px] ${unread ? "text-[#050505] font-bold" : "text-[#65676B]"}`}>
+            {render(latestMessage)}
+          </p>
+          {latestMessage && <p>{"  ·  "}</p>}
+          <p className={` text-[#65676B]`}>{timeAgo}</p>
         </div>
       </div>
     </Link >
