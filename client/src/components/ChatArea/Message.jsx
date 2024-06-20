@@ -2,6 +2,7 @@ import Avatar from '../Avatar';
 import HoverInfo from '../HoverInfo';
 import Like from '../../assets/svg/Like';
 import { formatTime } from '~/utils/handleTime';
+import {lazy} from 'react'
 
 const Message = ({ message, direction, order }) => {
   const renderContent = () => {
@@ -31,9 +32,9 @@ const Message = ({ message, direction, order }) => {
   }
 
   return (
-    <div className={`flex items-center gap-2 ${direction === 'send' ? 'flex-row-reverse' : ''}`}>
+    <div className={`flex ${message?.messageType === 'like' ? 'items-end' : 'items-center'}  gap-2 ${direction === 'send' ? 'flex-row-reverse' : ''}`}>
       <div className={`${(direction === 'receive' ? "flex" : "hidden")} ${(order === 'last' || order === 'single') ? 'flex' : 'invisible'}`}>
-        <Avatar srcImg="https://res.cloudinary.com/dyapfpkgr/image/upload/v1715022080/Chat-app/download_b5rilg.jpg" size="7" />
+        <Avatar srcImg={message?.sender?.avatar} size="7" />
       </div>
 
       <div className='parent'>

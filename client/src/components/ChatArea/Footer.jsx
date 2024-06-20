@@ -10,8 +10,8 @@ import HoverInfo from "../HoverInfo";
 import useSocket from "~/hooks/useSocket";
 
 const Footer = () => {
-    const [isMultiLine, setIsMultiLine] = useState(false);
     const textareaRef = useRef(null);
+    const [isMultiLine, setIsMultiLine] = useState(false);
     const [open, setOpen] = useState(false);
     const [data, setData] = useState(null);
     const { socketEmit, userId } = useSocket();
@@ -30,7 +30,7 @@ const Footer = () => {
     }
 
     const handlePickEmoji = (emoji) => {
-        setData((prev) => ({ ...prev, text: (prev?.text ?? "" ) + emoji.emoji }));
+        setData((prev) => ({ ...prev, text: (prev?.text ?? "") + emoji.emoji }));
     }
 
     const handleOnKeyDown = (e) => {
@@ -68,7 +68,14 @@ const Footer = () => {
         setData(null);
         setIsMultiLine(false);
         textareaRef.current.style.height = 'auto';
-    },[chatRoomId])
+    }, [chatRoomId])
+
+    useEffect(() => {
+        if (data?.text) {
+            console.log(data?.text) 
+            socketEmit("typing", userId, chatRoomId);
+        }
+    }, [data?.text])
 
     return (
         <div className={`flex flex-row px-3 pb-[10px] pt-1 w-full bottom-0 ${isMultiLine ? "items-end" : "items-center"}`}>

@@ -13,7 +13,10 @@ const MessageSchema = new mongoose.Schema({
         type: String,
         enum: ["text", "image", "video", "call", "voice", "document", "notification", "like"],
     },
-    sender: mongoose.Schema.Types.ObjectId,
+    sender: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Users"
+    },
     readStatus: {
         type: Boolean,
         default: false,

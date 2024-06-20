@@ -20,7 +20,6 @@ const ConfirmEmail = () => {
     const confirm = async () => {
       try {
         const response = await confirmEmail(token);
-        console.log(response);
         setContent(
           <div>
             <p className="text-center my-2">Your account is verified successfully!</p>
@@ -33,7 +32,6 @@ const ConfirmEmail = () => {
           </div>
         )
       } catch (error) {
-        console.log(error);
         setContent(
           <div>
             <p className="text-center my-2 text-red">{error.message}</p>

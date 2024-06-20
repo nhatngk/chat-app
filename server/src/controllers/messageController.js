@@ -23,7 +23,10 @@ exports.addMessage = async (message, chatRoomId) => {
             }
         })
     }
-    return newMessage;
+    const newMessageObj = await Message.findById(newMessage._id)
+    .populate("sender", "_id username avatar")
+    .exec();
+    return newMessageObj;
 }
 
 module.exports.addUndeliveredMessage = async ({ undeliveredMembers, messageId, chatRoomId }) => {

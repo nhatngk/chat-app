@@ -9,7 +9,7 @@ const { connectRedis } = require("./config/redis");
 const route = require("./routes/index");
 const { onlineController, disconnecting } = require("./socket/connectionSocket");
 const { addRequest, acceptRequest, deleteRequest, unfriend } = require("./socket/friendSocket");
-const { sendMessage } = require("./socket/messageSocket");
+const { sendMessage, typing } = require("./socket/messageSocket");
 const errorHandling = require("./middlewares/errorHandling");
 const secret = require("./config/env");
 
@@ -46,6 +46,7 @@ const launch = () => {
     io.on('connection', (socket) => {
         onlineController(io, socket);
         sendMessage(io, socket);
+        typing(io, socket);
         addRequest(io, socket);
         deleteRequest(io, socket);
         acceptRequest(io, socket);

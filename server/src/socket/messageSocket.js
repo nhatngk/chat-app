@@ -1,7 +1,7 @@
 const { addMessage, addUndeliveredMessage, handleUndeliveredMembers } = require("../controllers/messageController");
 
 exports.sendMessage = async (io, socket) => {
-    socket.on("sendMessage", async (message, chatRoomId) => {        
+    socket.on("sendMessage", async (message, chatRoomId) => {
         const newMessage = await addMessage(message, chatRoomId);
         io.timeout(10000)
             .to(chatRoomId)
@@ -31,5 +31,11 @@ exports.sendMessage = async (io, socket) => {
 
                 }
             });
+    })
+}
+
+exports.typing = async (io, socket) => {
+    socket.on("typing", async (userId, chatRoomId) => {
+        io.to(chatRoomId).emit("typing", userId, chatRoomId);
     })
 }

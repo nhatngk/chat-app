@@ -57,7 +57,7 @@ exports.getAllChatRooms = async (chatRooms, userId) => {
         const latestMessageId = chatRoomDetails.messageHistory.length && chatRoomDetails.messageHistory[chatRoomDetails.messageHistory.length - 1];
         if (latestMessageId) {
             chatRoomDetails.latestMessage = await Message.findById(latestMessageId)
-                .populate("sender", "_id username email avatar status")
+                .populate("sender", "_id username")
                 .exec();
         }
         const { messageHistory, ...rest } = chatRoomDetails;

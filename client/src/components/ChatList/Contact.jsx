@@ -12,7 +12,6 @@ const Contact = ({ chat }) => {
   const latestMessage = chat?.latestMessage;
   const unread = chat?.unreadMembers?.includes(userId);
   const currentChatRoom = useSelector((state) => state.chat.currentChatRoom);
-
   useEffect(() => { 
     if (latestMessage) {
       setTimeAgo(formatTimeAgo(latestMessage.timeSent));
@@ -24,27 +23,26 @@ const Contact = ({ chat }) => {
   }, [latestMessage])
 
   const render = (latestMessage) => {
-    const sender = latestMessage?.sender?.username;
+    const senderId = latestMessage?.sender?._id;
+    const senderName = latestMessage?.sender?.username;
     const type = latestMessage?.messageType;
     const roomType = chat?.roomType;
 
     if (type === "text") {
-      return `${sender === userId ? "You: " : (roomType === "private" ? "" : sender + ": ")}${latestMessage.message}`
+      return `${senderId === userId ? "You" : senderName}: ${latestMessage.message}`
     } else if (type === "image") {
-      return `${sender === userId ? "You" : sender} sent an image.`
+      return `${senderId === userId ? "You" : senderName} sent an image.`
     } else if (type === "video") {
-      return `$${sender === userId ? "You" : sender} sent a video.`
+      return `$${senderId === userId ? "You" : senderName} sent a video.`
     } else if (type === "voice") {
-      return `$${sender === userId ? "You" : sender} sent a voice note.`
+      return `$${senderId === userId ? "You" : senderName} sent a voice note.`
     } else if (type === "document") {
-      return `$${sender === userId ? "You" : sender} sent a file.`
+      return `$${senderId === userId ? "You" : senderName} sent a file.`
     } else if (type === "like") {
-      return
+      return `${senderId === userId ? "You" : senderName}: 👍`
     } else if (type === "call") {
       return ""
     }
-
-    return ""
   }
 
 
