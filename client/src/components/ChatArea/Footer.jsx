@@ -8,29 +8,33 @@ import Attach from "~/assets/svg/Attach";
 import Voice from "~/assets/svg/Voice";
 import HoverInfo from "../HoverInfo";
 import useSocket from "~/hooks/useSocket";
+import FilePreview from "./FilePreview";
 
 const Footer = () => {
     const textareaRef = useRef(null);
-    const [isMultiLine, setIsMultiLine] = useState(false);
+    const fileInputRef = useRef(null);
+    const [expand, setExpand] = useState(false);
     const [open, setOpen] = useState(false);
-    const [data, setData] = useState(null);
+    const [fileInputKey, setFileInputKey] = useState(Date.now());
+    const [data, setData] = useState({ text: null, files: [] });
     const { socketEmit, userId } = useSocket();
     const chatRoomId = useSelector((state) => state.chat.currentChatRoom);
-
+    console.log(data.files);
     const handleOnChange = (e) => {
         setData((prev) => ({ ...prev, text: e.target.value }));
         e.target.style.height = 'auto';
         const newHeight = e.target.scrollHeight;
         e.target.style.height = e.target.scrollHeight + 'px';
-        setIsMultiLine(newHeight > 30);
+        if (!expand) setExpand(newHeight > 30);
     }
 
     const handleToggleEmojiPicker = () => {
-        setOpen(!open);
+        setOpen(prev => !prev);
     }
 
     const handlePickEmoji = (emoji) => {
         setData((prev) => ({ ...prev, text: (prev?.text ?? "") + emoji.emoji }));
+        setOpen(false);
     }
 
     const handleOnKeyDown = (e) => {
@@ -51,43 +55,70 @@ const Footer = () => {
 
     const handleOnSubmit = (e) => {
         e.preventDefault();
-        if (!data) return;
-        socketEmit("sendMessage", {
-            sender: userId,
-            messageType: "text",
-            message: data?.text,
-        },
-            chatRoomId
-        );
-        setData(null);
-        setIsMultiLine(false);
+        if (!data.text && !data.files.length) return;
+
+        if (data.text) {
+            socketEmit("sendMessage", {
+                sender: userId,
+                messageType: "text",
+                message: data.text,
+            },
+                chatRoomId
+            );
+        }
+        if (data.files.length) {
+            data.files.forEach((file) => {
+                socketEmit("sendMessage", {
+                    sender: userId,
+                    messageType: "file",
+                    message: file,
+                },
+                    chatRoomId
+                );
+            })
+        }
+
+        setData({ text: null, files: [] });
+        setOpen(false);
         textareaRef.current.style.height = 'auto';
     }
 
+    const handleFileChange = (e) => {
+        setData((prev) => ({ ...prev, files: [...prev.files, ...Array.from(e.target.files)] }));
+        setExpand(true);
+        setFileInputKey(Date.now());
+    };
+
     useEffect(() => {
-        setData(null);
-        setIsMultiLine(false);
+        setData({ text: null, files: [] });
+        setExpand(false);
         textareaRef.current.style.height = 'auto';
     }, [chatRoomId])
 
     useEffect(() => {
-        if (data?.text) {
-            console.log(data?.text) 
+        if (data.text) {
             socketEmit("typing", userId, chatRoomId);
         }
-    }, [data?.text])
+    }, [data.text])
+
+    useEffect(() => {
+        if (!data.files.length && !data.text) {
+            setExpand(false);
+        }
+    }, [data])
 
     return (
-        <div className={`flex flex-row px-3 pb-[10px] pt-1 w-full bottom-0 ${isMultiLine ? "items-end" : "items-center"}`}>
+        <div className={`flex flex-row px-3 pb-[10px] pt-1 w-full bottom-0 ${expand ? "items-end" : "items-center"}`}>
             <div className="flex items-center">
-                <div className={`hover-circle size-9 flex items-center justify-center ${isMultiLine ? "mb-[2px]" : ""}`}>
-                    <div className="parent">
+                <div className={`hover-circle size-9 flex items-center justify-center ${expand ? "mb-[2px]" : ""}`}>
+                    <label htmlFor="file" className="parent relative">
                         <Attach />
                         <HoverInfo text="Attach file" direction="top" />
-                    </div>
+                    </label>
+                    <input key={fileInputKey} id="file" type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
                 </div>
 
-                <div className={`hover-circle size-9 flex items-center justify-center ${isMultiLine ? "mb-[2px]" : ""} `}>
+                <div className={`hover-circle size-9 flex items-center justify-center ${expand ? "mb-[2px]" : ""} `}>
                     <div className="parent">
                         <Voice />
                         <HoverInfo text="Voice" direction="top" />
@@ -95,67 +126,86 @@ const Footer = () => {
                 </div>
             </div>
 
-            <form
-                onSubmit={handleOnSubmit}
-                className="w-full flex flex-row relative mx-2 bg-[#f0f2f5] rounded-3xl p-2"
-            >
-                <textarea
-                    ref={textareaRef}
-                    onChange={handleOnChange}
-                    onKeyDown={handleOnKeyDown}
-                    value={data?.text || ""}
-                    rows="1" cols="50"
-                    placeholder="Aa"
-                    className={`max-h-36 resize-none w-full mx-3 mr-6 pr-2 outline-none bg-[#f0f2f5] overflow-auto "}`}
-                />
-
-                <div className={`absolute right-0 translate-y-[50%] ${isMultiLine ? "bottom-5" : "bottom-[50%] "} `}>
-                    <div onClick={handleToggleEmojiPicker} className="relative hover-circle size-8  flex items-center justify-center hover:bg-[#c2bbbb]" >
-                        <div className="parent">
-                            <EmojiPickerButton />
-                            <HoverInfo text="Pick emoji" direction="top" />
-                        </div>
-                        <div className="absolute top-[-320px] right-[0px]">
-                            <EmojiPicker
-                                open={open}
-                                onEmojiClick={handlePickEmoji}
-                                width={300}
-                                height={300}
-                                rows={5}
-                                perRow={8}
-                                emojiSize={20}
-                                emojiStyle="facebook"
-                                previewConfig={{
-                                    showPreview: false
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </form>
-
-            <div className="">
+            <div className="w-full flex flex-col mx-2 bg-[#f0f2f5] rounded-3xl p-2 relative">
                 {
-                    data?.text ? (
-                        <div onClick={handleOnSubmit}
-                            className={`${isMultiLine ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}
-                        >
-                            <div className="parent">
-                                <SendMessage />
-                                <HoverInfo text="Press to send" direction="top-left" />
-                            </div>
-
-                        </div>
-                    ) : (
-                        <div className="hover-circle size-9 flex items-center justify-center" onClick={handleOnClickLike}>
-                            <div className="parent ">
-                                <Like />
-                                <HoverInfo text="Send like" direction="top-left" />
-                            </div>
+                    !!data.files.length && (
+                        <div className="p-2 mb-2 flex gap-3">
+                            {data?.files?.map((file, index) => {
+                                return (
+                                    <FilePreview
+                                        index={index}
+                                        key={file.name}
+                                        setData={setData}
+                                        file={file}
+                                        setFileInputKey={setFileInputKey}
+                                    />
+                                )
+                            })}
                         </div>
                     )
                 }
+
+                <form
+                    onSubmit={handleOnSubmit}
+                    className="relative flex w-full flex-1 items-center"
+                >
+                    <textarea
+                        ref={textareaRef}
+                        onChange={handleOnChange}
+                        onKeyDown={handleOnKeyDown}
+                        value={data?.text || ""}
+                        rows="1" cols="50"
+                        placeholder="Aa"
+                        className={`max-h-36 resize-none ml-2 mr-7 w-full outline-none bg-[#f0f2f5] overflow-auto "}`}
+                    />
+
+                    <div className={`absolute right-0 translate-y-[50%] ${expand ? "bottom-5" : "bottom-[50%] "} `}>
+                        <div onClick={handleToggleEmojiPicker} className="relative hover-circle size-8 flex items-center justify-center hover:bg-[#c2bbbb]" >
+                            <div className="parent">
+                                <EmojiPickerButton />
+                                <HoverInfo text="Pick emoji" direction="top" />
+                            </div>
+                            <div className="absolute top-[-320px] right-[0px]">
+                                <EmojiPicker
+                                    lazyLoadEmojis={true}
+                                    open={open}
+                                    onEmojiClick={handlePickEmoji}
+                                    width={300}
+                                    height={300}
+                                    rows={5}
+                                    perRow={8}
+                                    emojiSize={16}
+                                    emojiStyle="facebook"
+                                    previewConfig={{
+                                        showPreview: false
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
+
+            {
+                data?.text ? (
+                    <div onClick={handleOnSubmit}
+                        className={`${expand ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}
+                    >
+                        <div className="parent">
+                            <SendMessage />
+                            <HoverInfo text="Press to send" direction="top-left" />
+                        </div>
+
+                    </div>
+                ) : (
+                    <div className="hover-circle size-9 flex items-center justify-center" onClick={handleOnClickLike}>
+                        <div className="parent ">
+                            <Like />
+                            <HoverInfo text="Send like" direction="top-left" />
+                        </div>
+                    </div>
+                )
+            }
         </div>
     )
 }

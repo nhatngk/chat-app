@@ -12,6 +12,7 @@ const Contact = ({ chat }) => {
   const latestMessage = chat?.latestMessage;
   const unread = chat?.unreadMembers?.includes(userId);
   const currentChatRoom = useSelector((state) => state.chat.currentChatRoom);
+  
   useEffect(() => { 
     if (latestMessage) {
       setTimeAgo(formatTimeAgo(latestMessage.timeSent));

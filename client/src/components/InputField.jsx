@@ -13,7 +13,7 @@ const InputField = (props) => {
             {type === "password" ? (
                 <div className="relative">
                     <input
-                        currentPassword = "true"
+                        currentpassword = "true"
                         {...register(id)}
                         className={`input-form ${errors?.[id]?.message && "outline outline-1 outline-red"}`}
                         type={`${isPasswordVisible ? "text" : type}`} id={id} placeholder={placeholder} />

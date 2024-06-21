@@ -17,20 +17,24 @@ const Conversation = ({ typingList }) => {
   const userId = useSelector((state) => state.user.currentUser?.id);
   const currentChatRoom = useSelector((state) => state.chat.currentChatRoom);
   const conversation = useSelector((state) => state.chat.conversations).find(conversation => conversation.chatRoomId === currentChatRoom);
-
-  useEffect(() => {
+  useEffect(() => { 
     setMessages(conversation?.messages)
   }, [conversation])
+
+  useEffect(() => {
+    scrollToTheEnd();
+  }, [messages]);
 
   useEffect(() => {
     if (!!typingList.length && atTheEnd) {
       scrollToTheEnd();
       return;
-    } else if (!atTheEnd && !typingList.length) {
+    } else if (!typingList.length || !atTheEnd) {
       scrollToTheEnd();
       return;
     }
-  }, [messages, typingList])
+  }, [typingList])
+
 
   useEffect(() => {
     let isMounted = true;
@@ -69,7 +73,7 @@ const Conversation = ({ typingList }) => {
   )
 
   return (
-    <div onScroll={handleOnScroll} className=' flex flex-1 w-full flex-col py-2 px-4 gap-[2px] overflow-y-auto'>
+    <div onScroll={handleOnScroll} className='relative flex-1 w-full flex flex-col py-2 px-4 gap-0.5 overflow-auto'>
       {
         !!messages.length && messages.map((message, index) => {
           let order = null;
@@ -98,10 +102,11 @@ const Conversation = ({ typingList }) => {
             </div>)
         })
       }
+
       {
         !!typingList.length && (
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-1">
+          <div className="flex flex-col gap-1 mt-1">
+            <div className="flex items-center gap-2">
               <Avatar srcImg={typingList[0]?.avatar} size="7" />
               <div className="typing-indicator bg-[#f5f5f5] px-4 py-3 receive order-single">
                 <div className="dot"></div>
@@ -110,7 +115,7 @@ const Conversation = ({ typingList }) => {
               </div>
             </div>
 
-            <div className="ml-8">
+            <div className="ml-9">
               <p className="text-[#000] text-xs">
                 {
                   typingList?.length === 1 ? `${typingList[0]?.username} is typing` : `${typingList[0]?.username} and others are typing`
@@ -120,15 +125,20 @@ const Conversation = ({ typingList }) => {
           </div>
         )
       }
-      <div ref={endOfConversation} />
+
       {
         !atTheEnd && (
-          <button onClick={scrollToTheEnd} className="flex items-center justify-center absolute left-1/2 z-50 bottom-20 size-10 rounded-full bg-[#f5f5f5]">
+          <button
+            onClick={scrollToTheEnd}
+            className="sticky p-5 bottom-10 flex items-center justify-center left-1/2 translate-x-[-50%] z-80 size-10 rounded-full bg-[#f5f5f5]"
+          >
             <ArrowDown />
           </button>
         )
       }
+      <div ref={endOfConversation} />
     </div>
+
   )
 }
 
