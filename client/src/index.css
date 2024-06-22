@@ -27,7 +27,6 @@
     font-size: 12px;
     z-index: 999;
     white-space: nowrap;
-    transition: visibility 0s, opacity 0.2s linear;
 
     &.left {
       top: 50%;

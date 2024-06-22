@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
+import { notifyError } from "~/utils/toastify";
+import { upload } from "~/api/uploadApi";
 import EmojiPicker from "emoji-picker-react";
 import SendMessage from "~/assets/svg/SendMessage";
 import Like from "~/assets/svg/Like";
@@ -19,7 +21,6 @@ const Footer = () => {
     const [data, setData] = useState({ text: null, files: [] });
     const { socketEmit, userId } = useSocket();
     const chatRoomId = useSelector((state) => state.chat.currentChatRoom);
-    console.log(data.files);
     const handleOnChange = (e) => {
         setData((prev) => ({ ...prev, text: e.target.value }));
         e.target.style.height = 'auto';
@@ -66,15 +67,23 @@ const Footer = () => {
                 chatRoomId
             );
         }
-        if (data.files.length) {
-            data.files.forEach((file) => {
-                socketEmit("sendMessage", {
-                    sender: userId,
-                    messageType: "file",
-                    message: file,
-                },
-                    chatRoomId
-                );
+        if(data.files.length) {
+            data.files.forEach(async (file) => {
+                try {
+                    const response = await upload(file);
+                    if(file.type.startsWith("image/")) {
+                        socketEmit("sendMessage", {
+                            sender: userId,
+                            messageType: "image",
+                            imageUrl: response.url,
+                        },
+                            chatRoomId
+                        );
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+
             })
         }
 
@@ -84,7 +93,11 @@ const Footer = () => {
     }
 
     const handleFileChange = (e) => {
-        setData((prev) => ({ ...prev, files: [...prev.files, ...Array.from(e.target.files)] }));
+        const validFiles = Array.from(e.target.files).filter(file => file.size <= 25 * 1024 * 1024);
+        if (validFiles.length < e.target.files.length) {
+            notifyError("Max file size is 25MB");
+        }
+        setData((prev) => ({ ...prev, files: [...prev.files, ...validFiles] }));
         setExpand(true);
         setFileInputKey(Date.now());
     };
@@ -115,7 +128,8 @@ const Footer = () => {
                         <Attach />
                         <HoverInfo text="Attach file" direction="top" />
                     </label>
-                    <input key={fileInputKey} id="file" type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
+                    <input key={fileInputKey} id="file" type="file" encType="multipart/form-data"
+                    ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
                 </div>
 
                 <div className={`hover-circle size-9 flex items-center justify-center ${expand ? "mb-[2px]" : ""} `}>
@@ -187,7 +201,7 @@ const Footer = () => {
             </div>
 
             {
-                data?.text ? (
+                (data?.text || data?.files?.length) ? (
                     <div onClick={handleOnSubmit}
                         className={`${expand ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}
                     >

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
 import { getAllMessages } from "~/api/chatApi";
 import { chatActions } from "~/store/chatSlice";
 import Avatar from "../Avatar";
@@ -14,16 +14,28 @@ const Conversation = ({ typingList }) => {
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([]);
   const [atTheEnd, setAtTheEnd] = useState(false);
+  const [height, setHeight] = useState(0);
+  const containerRef = useRef(null);
   const userId = useSelector((state) => state.user.currentUser?.id);
   const currentChatRoom = useSelector((state) => state.chat.currentChatRoom);
   const conversation = useSelector((state) => state.chat.conversations).find(conversation => conversation.chatRoomId === currentChatRoom);
-  useEffect(() => { 
+
+  useEffect(() => {
     setMessages(conversation?.messages)
   }, [conversation])
 
   useEffect(() => {
+      setHeight(prev => {
+        if (containerRef.current?.scrollHeight > prev) {
+          return containerRef.current?.scrollHeight;
+        }
+        return prev
+      });
+  });
+
+  useEffect(() => {
     scrollToTheEnd();
-  }, [messages]);
+  }, [messages, height]);
 
   useEffect(() => {
     if (!!typingList.length && atTheEnd) {
@@ -73,7 +85,7 @@ const Conversation = ({ typingList }) => {
   )
 
   return (
-    <div onScroll={handleOnScroll} className='relative flex-1 w-full flex flex-col py-2 px-4 gap-0.5 overflow-auto'>
+    <div ref={containerRef} onScroll={handleOnScroll} className='relative flex-1 w-full flex flex-col py-2 px-4 gap-0.5 overflow-auto'>
       {
         !!messages.length && messages.map((message, index) => {
           let order = null;
@@ -138,7 +150,6 @@ const Conversation = ({ typingList }) => {
       }
       <div ref={endOfConversation} />
     </div>
-
   )
 }
 

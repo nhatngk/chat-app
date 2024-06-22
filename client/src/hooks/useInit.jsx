@@ -10,7 +10,9 @@ const useInit = () => {
 
     useEffect(() => {
         if (userId) {
-            socket.connect();
+            if (socket.disconnected) {
+                socket.connect();
+            }
             socketEmit('online', userId);
             socketListen('online', (userId) => {
                 dispatch(chatActions.setOnlineUser(userId));

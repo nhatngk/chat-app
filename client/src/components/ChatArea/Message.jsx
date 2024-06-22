@@ -1,8 +1,8 @@
 import Avatar from '../Avatar';
 import HoverInfo from '../HoverInfo';
 import Like from '../../assets/svg/Like';
+import LazyLoad from 'react-lazy-load';
 import { formatTime } from '~/utils/handleTime';
-import {lazy} from 'react'
 
 const Message = ({ message, direction, order }) => {
   const renderContent = () => {
@@ -21,12 +21,18 @@ const Message = ({ message, direction, order }) => {
 
       case 'image':
         return (
-          <img src={`${message?.imageUrl}`} alt="" className='max-w-xs max-h-xs h-auto w-auto rounded-xl' />
+          <LazyLoad threshold={0.9}>
+            <img
+              src={`${message?.imageUrl}`}
+              alt=""
+              className="max-w-xs max-h-xs h-auto w-auto rounded-xl"
+            />
+          </LazyLoad>
         );
 
       case 'like':
         return (
-          <Like size={10}/>
+          <Like size={10} />
         )
     }
   }

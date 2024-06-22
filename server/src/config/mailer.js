@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 const creeatError = require("http-errors");
-const secret = require("../config/env");
+const secret = require("./env");
 
-const sendEmail = async (res, body, message) => {
+ exports.sendEmail = async (res, body, message) => {
   const transporter = nodemailer.createTransport({
     host: secret.email_host,
     service: secret.email_service,
@@ -23,5 +23,3 @@ const sendEmail = async (res, body, message) => {
     return res.status(201).json({ message })
   });
 }
-
-module.exports = sendEmail;

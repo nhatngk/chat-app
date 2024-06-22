@@ -16,7 +16,7 @@ const secret = require("./config/env");
 const launch = () => {
     const app = express();
 
-    app.use(express.json({ "limit": "10mb" }));
+    app.use(express.json({ "limit": "25mb" }));
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
 

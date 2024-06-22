@@ -1,7 +1,7 @@
 const createError = require("http-errors");
 const Users = require("../models/Users");
 const secret = require("../config/env");
-const sendEmail = require("../ultis/mailer");
+const sendEmail = require("../config/mailer");
 const jwt = require("../ultis/jwt");
 const { client } = require("../config/redis");
 
