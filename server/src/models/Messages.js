@@ -8,6 +8,13 @@ const callDetailsSchema = new mongoose.Schema({
     callDuration: String,
 })
 
+const documentDetailsSchema = new mongoose.Schema({
+    documentName: String,
+    documentUrl: String,
+    documentType: String,
+    documentSize: String,
+})
+
 const MessageSchema = new mongoose.Schema({
     messageType: {
         type: String,
@@ -33,6 +40,7 @@ const MessageSchema = new mongoose.Schema({
     videoUrl: String,
     voiceNoteUrl: String,
     voiceNoteDuration: String,
+    documentDetails: documentDetailsSchema,
     callDetails: callDetailsSchema,
 });
 

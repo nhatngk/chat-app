@@ -98,7 +98,7 @@ const FriendModal = (props) => {
 
   return (
     <div onClick={handleOnClick}>
-      <div className="flex justify-center items-center fixed inset-0 z-50" ref={modal}>
+      <div className="flex-center  fixed inset-0 z-50" ref={modal}>
         <div className='flex flex-col relative p-2 pb-0 w-1/2 h-3/4 min-w-[450px] bg-white rounded-3xl'>
           <h1 className="text-center">Friends</h1>
 

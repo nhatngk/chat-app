@@ -69,7 +69,7 @@ const SignIn = () => {
 
 
   return user ? <Navigate to={from} replace /> : (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex-center min-h-screen">
     <div className="min-w-96 mx-auto my-20 shadow-form px-8 py-10 rounded-xl">
       <h1
         className="text-center text-3xl font-bold mb-4"

@@ -45,13 +45,13 @@ const Header = () => {
             </div>
 
             <div className='flex gap-1'>
-                <div className=" hover-circle size-9 flex items-center justify-center ">
+                <div className=" hover-circle size-9 flex-center">
                     <div className="parent">
                         <Phone />
                         <HoverInfo text="Call" direction="bottom" />
                     </div>
                 </div>
-                <div className="mr-2 hover-circle size-9 flex items-center justify-center">
+                <div className="mr-2 hover-circle size-9 flex-center">
                     <div className="parent">
                         <Camera />
                         <HoverInfo text="Video call" direction="bottom" />

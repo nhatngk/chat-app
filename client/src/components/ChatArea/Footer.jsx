@@ -21,6 +21,7 @@ const Footer = () => {
     const [data, setData] = useState({ text: null, files: [] });
     const { socketEmit, userId } = useSocket();
     const chatRoomId = useSelector((state) => state.chat.currentChatRoom);
+    
     const handleOnChange = (e) => {
         setData((prev) => ({ ...prev, text: e.target.value }));
         e.target.style.height = 'auto';
@@ -67,11 +68,11 @@ const Footer = () => {
                 chatRoomId
             );
         }
-        if(data.files.length) {
+        if (data.files.length) {
             data.files.forEach(async (file) => {
                 try {
                     const response = await upload(file);
-                    if(file.type.startsWith("image/")) {
+                    if (file.type.startsWith("image/")) {
                         socketEmit("sendMessage", {
                             sender: userId,
                             messageType: "image",
@@ -80,8 +81,8 @@ const Footer = () => {
                             chatRoomId
                         );
                     }
-                    
-                    if(file.type.startsWith("video/")) {
+
+                    if (file.type.startsWith("video/")) {
                         socketEmit("sendMessage", {
                             sender: userId,
                             messageType: "video",
@@ -90,6 +91,19 @@ const Footer = () => {
                             chatRoomId
                         );
                     }
+
+                    socketEmit("sendMessage", {
+                        sender: userId,
+                        messageType: "document",
+                        documentDetails: {
+                            documentUrl: response.url,
+                            documentName: file.name,
+                            documentSize: file.size,
+                            documentType: file.type
+                        }
+                    },
+                        chatRoomId
+                    );
                 } catch (error) {
                     console.log(error);
                 }
@@ -133,16 +147,17 @@ const Footer = () => {
     return (
         <div className={`flex flex-row px-3 pb-[10px] pt-1 w-full bottom-0 ${expand ? "items-end" : "items-center"}`}>
             <div className="flex items-center">
-                <div className={`hover-circle size-9 flex items-center justify-center ${expand ? "mb-[2px]" : ""}`}>
+                <div className={`hover-circle size-9 flex-center ${expand ? "mb-[2px]" : ""}`}>
                     <label htmlFor="file" className="parent relative">
                         <Attach />
                         <HoverInfo text="Attach file" direction="top" />
                     </label>
+
                     <input key={fileInputKey} id="file" type="file" encType="multipart/form-data"
-                    ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
+                        ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
                 </div>
 
-                <div className={`hover-circle size-9 flex items-center justify-center ${expand ? "mb-[2px]" : ""} `}>
+                <div className={`hover-circle size-9 flex-center ${expand ? "mb-[2px]" : ""} `}>
                     <div className="parent">
                         <Voice />
                         <HoverInfo text="Voice" direction="top" />
@@ -184,11 +199,12 @@ const Footer = () => {
                     />
 
                     <div className={`absolute right-0 translate-y-[50%] ${expand ? "bottom-5" : "bottom-[50%] "} `}>
-                        <div onClick={handleToggleEmojiPicker} className="relative hover-circle size-8 flex items-center justify-center hover:bg-[#c2bbbb]" >
+                        <div onClick={handleToggleEmojiPicker} className="relative hover-circle size-8 flex-center hover:bg-[#c2bbbb]" >
                             <div className="parent">
                                 <EmojiPickerButton />
                                 <HoverInfo text="Pick emoji" direction="top" />
                             </div>
+
                             <div className="absolute top-[-320px] right-[0px]">
                                 <EmojiPicker
                                     lazyLoadEmojis={true}
@@ -213,7 +229,7 @@ const Footer = () => {
             {
                 (data?.text || data?.files?.length) ? (
                     <div onClick={handleOnSubmit}
-                        className={`${expand ? "mb-[2px]" : ""} hover-circle size-9 flex items-center justify-center `}
+                        className={`${expand ? "mb-[2px]" : ""} hover-circle size-9 flex-center `}
                     >
                         <div className="parent">
                             <SendMessage />
@@ -222,7 +238,7 @@ const Footer = () => {
 
                     </div>
                 ) : (
-                    <div className="hover-circle size-9 flex items-center justify-center" onClick={handleOnClickLike}>
+                    <div className="hover-circle size-9 flex-center" onClick={handleOnClickLike}>
                         <div className="parent ">
                             <Like />
                             <HoverInfo text="Send like" direction="top-left" />

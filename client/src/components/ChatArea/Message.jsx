@@ -4,11 +4,21 @@ import Avatar from '../Avatar';
 import HoverInfo from '../HoverInfo';
 import Like from '../../assets/svg/Like';
 import LazyLoad from 'react-lazy-load';
-import { formatTime } from '~/utils/handleTime';
 import PlayButton from '~/assets/svg/PlayButton';
+import FileIcon from '~/assets/svg/FileIcon';
+import { formatTime } from '~/utils/handleTime';
 
 const Message = ({ message, direction, order }) => {
   const dispatch = useDispatch();
+  const formatSize = (size) => {
+    if (size < 1024) {
+      return `${size} B`;
+    } else if (size < 1024 * 1024) {
+      return `${(size / 1024).toFixed(2)} KB`;
+    } else {
+      return `${(size / 1024 / 1024).toFixed(2)} MB`;
+    }
+  }
   const handleShowMedia = () => {
     let url;
     if (message?.messageType === 'image') {
@@ -17,6 +27,24 @@ const Message = ({ message, direction, order }) => {
       url = message?.videoUrl;
     }
     dispatch(setShowMedia({ isShow: true, type: message?.messageType, url }));
+  }
+
+  const handleDownload = (e) => {
+    e.preventDefault();
+    const documentDetails = message?.documentDetails;
+    fetch(documentDetails?.documentUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const fileURL = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = fileURL;
+        a.download = documentDetails?.documentName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(fileURL);
+        document.body.removeChild(a);
+      })
+      .catch(error => console.error('File download error:', error));
   }
 
   const renderContent = () => {
@@ -40,7 +68,7 @@ const Message = ({ message, direction, order }) => {
               <img
                 src={`${message?.imageUrl}`}
                 alt=""
-                className="max-w-xs max-h-xs h-auto w-auto rounded-xl"
+                className="max-w-xs max-h-xs h-auto w-auto rounded-[18px] object-cover"
               />
             </LazyLoad>
           </div>
@@ -51,15 +79,32 @@ const Message = ({ message, direction, order }) => {
           <div onClick={handleShowMedia}>
             <LazyLoad threshold={0.9}>
               <video
-                poster
                 src={`${message?.videoUrl}`}
-                className="max-w-xs max-h-xs h-auto w-auto rounded-xl"
+                className="max-w-xs max-h-xs h-auto w-auto rounded-[18px] object-cover"
               />
             </LazyLoad>
             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white'>
-              <PlayButton size={16}/>
+              <PlayButton size={16} />
             </div>
           </div>
+        )
+
+      case "document":
+        const documentDetails = message?.documentDetails;
+        return (
+          <a
+            onClick={handleDownload}
+            className='flex-center gap-2 rounded-[18px] p-3 bg-[#f3f3f8] hover:bg-[#dfdbdf] cursor-pointer'
+          >
+            <div className='rounded-full bg-[#bec1c4] p-1'>
+              <FileIcon />
+            </div>
+
+            <div className='flex flex-col'>
+              <p className=' font-medium'>{documentDetails?.documentName}</p>
+              <p className='text-[#65676B]'>{formatSize(documentDetails?.documentSize)}</p>
+            </div>
+          </a>
         )
       case 'like':
         return (

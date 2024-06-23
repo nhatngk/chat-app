@@ -30,7 +30,7 @@ const Contact = ({ chat }) => {
     const roomType = chat?.roomType;
 
     if (type === "text") {
-      return `${senderId === userId ? "You" : senderName}: ${latestMessage.message}`
+      return `${senderId === userId ? "You: " : (roomType === "private" ? "" : senderName + ": ")}${latestMessage.message}`
     } else if (type === "image") {
       return `${senderId === userId ? "You" : senderName} sent an image.`
     } else if (type === "video") {
@@ -38,7 +38,7 @@ const Contact = ({ chat }) => {
     } else if (type === "voice") {
       return `$${senderId === userId ? "You" : senderName} sent a voice note.`
     } else if (type === "document") {
-      return `$${senderId === userId ? "You" : senderName} sent a file.`
+      return `${senderId === userId ? "You" : senderName} sent a file.`
     } else if (type === "like") {
       return `${senderId === userId ? "You" : senderName}: 👍`
     } else if (type === "call") {
@@ -61,7 +61,7 @@ const Contact = ({ chat }) => {
         </div>
       ) : (
         <div>
-          <div className="relative size-12 rounded-full bg-[#fcfafa] flex items-center justify-center font-bold text-2xl">
+          <div className="relative size-12 rounded-full bg-[#fcfafa] flex font-bold text-2xl">
             {chat.name[0].toUpperCase()}
           </div>
 

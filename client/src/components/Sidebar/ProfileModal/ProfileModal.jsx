@@ -46,7 +46,7 @@ const ProfileModal = (props) => {
 
     return (
         <div onClick={handleOnClick}>
-            <div className="flex justify-center items-center fixed inset-0 z-50" ref={modal} >
+            <div className="flex-center fixed inset-0 z-50" ref={modal} >
                 <div className="relative flex bg-white rounded-3xl size-3/4 ">
                     <div className='flex flex-col p-4 gap-2 border-r border-blur'>
                         {sectionList.map((section, index) => (

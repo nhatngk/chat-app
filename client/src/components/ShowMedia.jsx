@@ -11,7 +11,7 @@ const ShowMedia = () => {
 
     return (
         <div className="fixed inset-0 z-100">
-            <div className="relative bg-[#1f1e1e] w-full h-full flex items-center justify-center">
+            <div className="relative bg-[#1f1e1e] w-full h-full flex-center">
                 {
                     showMedia.type === "image" ? (
                         <img src={showMedia.url} alt="image" className="w-[90%] h-[90%] object-cover" />

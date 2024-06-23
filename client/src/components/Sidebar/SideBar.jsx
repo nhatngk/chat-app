@@ -41,7 +41,7 @@ const SideBar = (props) => {
   return (
     <div className="w-16 flex flex-col justify-between border-r-[1px] border-solid border-blur">
 
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex-col flex-center">
         <button
           className={`mt-1 p-3 rounded-lg flex justify-center ${showFriendModal ? "bg-blur" : ""}  hover:bg-blur`}
           type="button"

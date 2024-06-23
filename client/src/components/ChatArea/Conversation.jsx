@@ -142,7 +142,7 @@ const Conversation = ({ typingList }) => {
         !atTheEnd && (
           <button
             onClick={scrollToTheEnd}
-            className="sticky p-5 bottom-10 flex items-center justify-center left-1/2 translate-x-[-50%] z-80 size-10 rounded-full bg-[#f5f5f5]"
+            className="sticky p-5 bottom-10 flex-center left-1/2 translate-x-[-50%] z-80 size-10 rounded-full bg-[#f5f5f5]"
           >
             <ArrowDown />
           </button>
