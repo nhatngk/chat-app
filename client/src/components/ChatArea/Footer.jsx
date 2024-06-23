@@ -80,6 +80,16 @@ const Footer = () => {
                             chatRoomId
                         );
                     }
+                    
+                    if(file.type.startsWith("video/")) {
+                        socketEmit("sendMessage", {
+                            sender: userId,
+                            messageType: "video",
+                            videoUrl: response.url,
+                        },
+                            chatRoomId
+                        );
+                    }
                 } catch (error) {
                     console.log(error);
                 }

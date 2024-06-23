@@ -19,7 +19,7 @@ const Conversation = ({ typingList }) => {
   const userId = useSelector((state) => state.user.currentUser?.id);
   const currentChatRoom = useSelector((state) => state.chat.currentChatRoom);
   const conversation = useSelector((state) => state.chat.conversations).find(conversation => conversation.chatRoomId === currentChatRoom);
-
+  
   useEffect(() => {
     setMessages(conversation?.messages)
   }, [conversation])
